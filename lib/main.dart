@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_tambakku/pages/introduction_page.dart';
+import 'package:frontend_tambakku/pages/login_page.dart';
+import 'package:frontend_tambakku/pages/register_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,6 +16,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Tambakku APP 1.0.0',
       home: const IntroductionPage(),
+      // home: const LoginPage(),
+      // home: const RegisterPage(),
       theme: ThemeData(fontFamily: 'Montserrat'),
       debugShowCheckedModeBanner: false,
     );
