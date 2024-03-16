@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend_tambakku/logic/states.dart';
+import 'package:frontend_tambakku/pages/layout.dart';
 import 'package:frontend_tambakku/pages/register_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:quickalert/quickalert.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
   bool isVisible = false;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -59,24 +65,56 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(
                   height: 20,
                 ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                      textStyle: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      minimumSize: const Size(double.infinity, 55),
-                      backgroundColor: const Color(0xff227BE5),
-                      elevation: 4,
-                      shadowColor: Colors.black),
-                  child: const Text("Masuk",
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat')),
+                Consumer(
+                  builder: (context, ref, child) => ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        setState(() {
+                          isLoading = true;
+                        });
+
+                        ref
+                            .read(authNotifierProvider.notifier)
+                            .loginUser(email.text, password.text)
+                            .then((value) => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const Layout())))
+                            .catchError((error) {
+                          print(error);
+                          QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.error,
+                            title: "Error",
+                            text: "Email atau Password Salah",
+                          );
+
+                          setState(() {
+                            isLoading = false;
+                          });
+                        });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                        textStyle: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        minimumSize: const Size(double.infinity, 55),
+                        backgroundColor: const Color(0xff227BE5),
+                        elevation: 4,
+                        shadowColor: Colors.black),
+                    child: isLoading
+                        ? LoadingAnimationWidget.discreteCircle(
+                            color: CustomColors.putih, size: 25)
+                        : const Text("Masuk",
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Montserrat')),
+                  ),
                 ),
                 const SizedBox(
                   height: 15,
@@ -130,17 +168,22 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(
               height: 10,
             ),
-            SizedBox(
-              height: 55,
-              child: TextFormField(
-                controller: email,
-                decoration: InputDecoration(
-                  hintText: "Masukkan Email",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+            TextFormField(
+              controller: email,
+              decoration: InputDecoration(
+                hintText: "Masukkan Email",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               ),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return "Email tidak boleh kosong";
+                }
+                return null;
+              },
             ),
             const SizedBox(
               height: 15,
@@ -152,28 +195,33 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(
               height: 10,
             ),
-            SizedBox(
-              height: 55,
-              child: TextFormField(
-                controller: password,
-                obscureText:
-                    isVisible ? false : true, // set value ketika icon di klik
-                decoration: InputDecoration(
-                  hintText: "Masukkan Kata Sandi",
-                  suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isVisible = !isVisible;
-                        });
-                      },
-                      icon: isVisible
-                          ? const Icon(Icons.visibility_rounded)
-                          : const Icon(Icons.visibility_off)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+            TextFormField(
+              controller: password,
+              obscureText:
+                  isVisible ? false : true, // set value ketika icon di klik
+              decoration: InputDecoration(
+                hintText: "Masukkan Kata Sandi",
+                suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isVisible = !isVisible;
+                      });
+                    },
+                    icon: isVisible
+                        ? const Icon(Icons.visibility_rounded)
+                        : const Icon(Icons.visibility_off)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               ),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return "Kata Sandi tidak boleh kosong";
+                }
+                return null;
+              },
             ),
           ],
         ));

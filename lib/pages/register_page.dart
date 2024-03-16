@@ -1,7 +1,13 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend_tambakku/logic/states.dart';
+import 'package:frontend_tambakku/models/user.dart';
+import 'package:frontend_tambakku/pages/layout.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:quickalert/quickalert.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -25,8 +31,9 @@ class _RegisterPageState extends State<RegisterPage> {
   bool passwordIsVisible = false;
   bool passwordConfirmationIsVisible = false;
   bool dateIsVisible = false;
+  bool isLoading = false;
 
-  late int step; // nanti simpan ke state management
+  late int step;
 
   @override
   void initState() {
@@ -106,16 +113,17 @@ class _RegisterPageState extends State<RegisterPage> {
       color: CustomColors.primary,
       child: TextButton(
         onPressed: () {
-          // if (_credentialFormKey.currentState!.validate()) {
-          //   setState(() {
-          //     step = 2;
-          //   });
-          // }
-          if (step == 1) {
+          if (_credentialFormKey.currentState!.validate()) {
             setState(() {
               step = 2;
             });
           }
+
+          // Check if the form inserted to controller?
+          print('Name : ${name.text}');
+          print('Email : ${email.text}');
+          print('Password : ${password.text}');
+          print('Password Confirmation : ${passwordConfirmation.text}');
         },
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -163,30 +171,82 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 )),
           ),
-          Container(
-              width: MediaQuery.of(context).size.width * 0.5,
-              color: CustomColors.primary,
-              height: 55,
-              child: TextButton(
-                onPressed: () {
-                  print("OKE");
-                  // Set isLoading to true
-                },
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Daftar",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Montserrat',
-                            color: CustomColors.putih)),
-                    SizedBox(width: 15),
-                    Icon(Icons.check_circle_rounded,
-                        color: Colors.white, size: 20)
-                  ],
-                ),
-              )),
+          Consumer(
+            builder: (context, ref, child) => Container(
+                width: MediaQuery.of(context).size.width * 0.5,
+                color: CustomColors.primary,
+                height: 55,
+                child: TextButton(
+                  onPressed: () {
+                    if (_personalDataFormKey.currentState!.validate()) {
+                      // Set isLoading to true
+                      setState(() {
+                        isLoading = true;
+                      });
+                      final user = User(
+                          name: name.text,
+                          email: email.text,
+                          password: password.text,
+                          password_confirmation: passwordConfirmation.text,
+                          phone: phoneNumber.text,
+                          birthdate: birthdate.text,
+                          gender: gender);
+
+                      // Call the registerUser method from the AuthNotifier
+                      ref
+                          .read(authNotifierProvider.notifier)
+                          .registerUser(user)
+                          .then((value) {
+                        // Set isLoading to false
+                        setState(() {
+                          isLoading = false;
+                        });
+                        // Show the response from the server
+                        QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.success,
+                            title: "Berhasil",
+                            text: "Pendaftaran Berhasil");
+
+                        // Navigate to Homepage
+
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Layout()));
+                      }).catchError((value) {
+                        // Set isLoading to false
+                        setState(() {
+                          isLoading = false;
+                        });
+                        // Show the response from the server
+                        QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.error,
+                            title: "Gagal",
+                            text: "Pendaftaran Gagal");
+                      });
+                    }
+                  },
+                  child: isLoading
+                      ? LoadingAnimationWidget.discreteCircle(
+                          color: CustomColors.putih, size: 25)
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Daftar",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Montserrat',
+                                    color: CustomColors.putih)),
+                            SizedBox(width: 15),
+                            Icon(Icons.check_circle_rounded,
+                                color: Colors.white, size: 20)
+                          ],
+                        ),
+                )),
+          ),
         ],
       ),
     );
@@ -201,51 +261,55 @@ class _RegisterPageState extends State<RegisterPage> {
       left: 0,
       right: 0,
       bottom: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _credentialFormKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text("Daftar",
-                  style: TextStyle(fontSize: 37, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 15),
-              // Nama Lengkap
-              const Text("Nama Lengkap",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-              const SizedBox(height: 10),
-              SizedBox(
-                  height: 55,
-                  child: TextFormField(
-                    controller: name,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8))),
-                      hintText: "Masukkan Nama Lengkap Anda",
-                      hintStyle: TextStyle(fontSize: 16),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "Nama tidak boleh kosong";
-                      }
-                      return null;
-                    },
-                  )),
-              const SizedBox(height: 15),
-              const Text("Email",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-              const SizedBox(height: 10),
-              // Email
-              SizedBox(
-                height: 55,
-                child: TextFormField(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            key: _credentialFormKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Daftar",
+                    style:
+                        TextStyle(fontSize: 37, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 15),
+                // Nama Lengkap
+                const Text("Nama Lengkap",
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: name,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8))),
+                    hintText: "Masukkan Nama Lengkap Anda",
+                    hintStyle: TextStyle(fontSize: 16),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Nama tidak boleh kosong";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 15),
+                const Text("Email",
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
+                // Email
+                TextFormField(
                   controller: email,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(8))),
                     hintText: "Masukkan Email Anda",
                     hintStyle: TextStyle(fontSize: 16),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                   ),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -254,14 +318,12 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   },
                 ),
-              ),
-              const SizedBox(height: 15),
-              const Text("Kata Sandi",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 55,
-                child: TextFormField(
+                const SizedBox(height: 15),
+                const Text("Kata Sandi",
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
+                TextFormField(
                   controller: password,
                   obscureText: !passwordIsVisible,
                   decoration: InputDecoration(
@@ -279,6 +341,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           ? Icons.visibility
                           : Icons.visibility_off),
                     ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 12),
                   ),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -287,14 +351,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   },
                 ),
-              ),
-              const SizedBox(height: 15),
-              const Text("Konfirmasi Kata Sandi",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 55,
-                child: TextFormField(
+                const SizedBox(height: 15),
+                const Text("Konfirmasi Kata Sandi",
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: passwordConfirmation,
                   obscureText: !passwordConfirmationIsVisible,
                   decoration: InputDecoration(
                     border: const OutlineInputBorder(
@@ -312,6 +375,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           ? Icons.visibility
                           : Icons.visibility_off),
                     ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 12),
                   ),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -320,9 +385,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   },
                 ),
-              ),
-              const SizedBox(height: 15),
-            ],
+                const SizedBox(height: 100),
+              ],
+            ),
           ),
         ),
       ),
@@ -334,7 +399,7 @@ class _RegisterPageState extends State<RegisterPage> {
   // =========================
   Widget personalDataForm() {
     return Positioned(
-      top: -100,
+      top: -60,
       left: 0,
       right: 0,
       bottom: 0,
@@ -354,24 +419,23 @@ class _RegisterPageState extends State<RegisterPage> {
                     style:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 10),
-                SizedBox(
-                  height: 55,
-                  child: TextFormField(
-                    controller: phoneNumber,
-                    keyboardType: TextInputType.phone,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8))),
-                      hintText: "Masukkan Nomor Telepon",
-                      hintStyle: TextStyle(fontSize: 16),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "Nomor Telepon tidak boleh kosong";
-                      }
-                      return null;
-                    },
+                TextFormField(
+                  controller: phoneNumber,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8))),
+                    hintText: "Masukkan Nomor Telepon",
+                    hintStyle: TextStyle(fontSize: 16),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                   ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Nomor Telepon tidak boleh kosong";
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 15),
                 const Text("Gender",
@@ -400,6 +464,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   onChanged: (value) {
                     gender = value.toString();
                   },
+                  validator: (value) {
+                    if (value == null) {
+                      return "Jenis Kelamin tidak boleh kosong";
+                    }
+                  },
                 )),
                 const SizedBox(height: 15),
                 const Text("Tanggal Lahir",
@@ -419,11 +488,17 @@ class _RegisterPageState extends State<RegisterPage> {
 
                           if (value != null) {
                             birthdate.text =
-                                DateFormat("dd/MM/yyyy").format(value[0]!);
+                                DateFormat("dd-MM-yyyy").format(value[0]!);
                           }
                         },
                         icon: const Icon(Icons.calendar_today)),
                   ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Tanggal Lahir tidak boleh kosong";
+                    }
+                    return null;
+                  },
                 ),
                 // Date Picker
               ],
