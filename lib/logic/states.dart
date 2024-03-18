@@ -16,6 +16,8 @@ Map<String, String> headers = {
 // authentication provider
 @riverpod
 class AuthNotifier extends _$AuthNotifier {
+  late String _token;
+
   @override
   Future<User> build() async {
     final response =
@@ -29,9 +31,9 @@ class AuthNotifier extends _$AuthNotifier {
   // Retrieve Token from device storage
   Future<String> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    _token = prefs.getString('token') ?? '';
 
-    return token.toString();
+    return _token.toString();
   }
 
   Future<void> registerUser(User user) async {
@@ -95,6 +97,12 @@ class AuthNotifier extends _$AuthNotifier {
     });
   }
 }
+
+// Provider for get a base_info user
+// @riverpod
+// Future<User> getBaseInfo() async {
+//   final String prefs = new 
+// }
 
 // Code Generator Command // 
 // dart run build_runner build

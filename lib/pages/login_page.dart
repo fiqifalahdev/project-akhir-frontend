@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states.dart';
 import 'package:frontend_tambakku/pages/layout.dart';
+import 'package:frontend_tambakku/pages/loading_page.dart';
 import 'package:frontend_tambakku/pages/register_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -79,7 +80,8 @@ class _LoginPageState extends State<LoginPage> {
                             .then((value) => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const Layout())))
+                                    builder: (context) =>
+                                        const LoadingScreen())))
                             .catchError((error) {
                           print(error);
                           QuickAlert.show(
