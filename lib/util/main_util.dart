@@ -9,4 +9,7 @@ class MainUtil {
 
   // login user
   String get loginUrl => '${_baseUrl}login';
+
+  // Get base info
+  String get baseInfo => '${_baseUrl}profiles';
 }

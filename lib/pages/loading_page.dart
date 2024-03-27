@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend_tambakku/logic/main_states.dart';
 import 'package:frontend_tambakku/logic/states.dart';
-import 'package:frontend_tambakku/pages/home_page.dart';
+import 'package:frontend_tambakku/models/base_info.dart';
 import 'package:frontend_tambakku/pages/layout.dart';
 import 'package:frontend_tambakku/pages/login_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
@@ -27,6 +27,9 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   Future<void> _getBaseInfo() async {
     final String token =
         await ref.read(authNotifierProvider.notifier).getToken();
+
+    // Fetch base info
+     final response = ref.watch(getBaseInfoProvider(token));
 
     // Cek apakah token sudah ada belum jika ada arahkan ke Homepage jika belum ke login
     token.isEmpty

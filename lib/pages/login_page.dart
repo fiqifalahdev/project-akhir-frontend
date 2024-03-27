@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states.dart';
-import 'package:frontend_tambakku/pages/layout.dart';
 import 'package:frontend_tambakku/pages/loading_page.dart';
 import 'package:frontend_tambakku/pages/register_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
