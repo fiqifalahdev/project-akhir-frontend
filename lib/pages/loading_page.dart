@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/pages/layout.dart';
 import 'package:frontend_tambakku/pages/login_page.dart';
+import 'package:frontend_tambakku/util/location.dart';
 import 'package:frontend_tambakku/util/styles.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoadingScreen extends ConsumerStatefulWidget {
@@ -22,20 +25,41 @@ class LoadingScreen extends ConsumerStatefulWidget {
 ///
 ///
 class _LoadingScreenState extends ConsumerState<LoadingScreen> {
+  // Get user location permission
+  LocationServices locationServices = LocationServices();
+
+  Future<void> _getUserLocation() async {
+    // get long lat
+    Position location = await locationServices.getLocation();
+
+    // get address from long lat
+    List<Placemark> listOfAddress =
+        await placemarkFromCoordinates(location.latitude, location.longitude);
+
+    Placemark placemark = listOfAddress[0];
+
+    String address =
+        "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.postalCode}, ${placemark.country}";
+
+    ref.read(addressProvider.notifier).setAddress(address);
+
+    print("Address : ${ref.watch(addressProvider)}");
+  }
+
   Future<void> _getBaseInfo() async {
     final token = await ref.watch(tokenProvider.future);
 
     // Cek apakah token sudah ada belum jika ada arahkan ke Homepage jika belum ke login
     token.isEmpty
         ? Future.delayed(
-            const Duration(seconds: 3),
+            const Duration(seconds: 5),
             () {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => const LoginPage()));
             },
           )
         : Future.delayed(
-            const Duration(seconds: 3),
+            const Duration(seconds: 5),
             () {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => const Layout()));
@@ -46,6 +70,7 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     _getBaseInfo();
+    _getUserLocation();
 
     return Scaffold(
         body: Stack(children: [

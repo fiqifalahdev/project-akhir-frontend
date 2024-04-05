@@ -264,3 +264,19 @@ class FileProvider extends StateNotifier<File> {
     }
   }
 }
+
+// =================================================================================
+// =========================== User Address Provider ===============================
+// =================================================================================
+
+final addressProvider = StateNotifierProvider<AddressProvider, String>((ref) {
+  return AddressProvider();
+});
+
+class AddressProvider extends StateNotifier<String> {
+  AddressProvider() : super('');
+
+  void setAddress(String address) {
+    state = address;
+  }
+}
