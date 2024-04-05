@@ -27,8 +27,8 @@ mixin _$BaseInfo {
   String get birthdate => throw _privateConstructorUsedError;
   String get role => throw _privateConstructorUsedError;
   String? get address => throw _privateConstructorUsedError;
-  String? get profile_image => throw _privateConstructorUsedError;
-  String? get banner_image => throw _privateConstructorUsedError;
+  String? get profileImage => throw _privateConstructorUsedError;
+  String? get bannerImage => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -49,8 +49,8 @@ abstract class $BaseInfoCopyWith<$Res> {
       String birthdate,
       String role,
       String? address,
-      String? profile_image,
-      String? banner_image});
+      String? profileImage,
+      String? bannerImage});
 }
 
 /// @nodoc
@@ -73,8 +73,8 @@ class _$BaseInfoCopyWithImpl<$Res, $Val extends BaseInfo>
     Object? birthdate = null,
     Object? role = null,
     Object? address = freezed,
-    Object? profile_image = freezed,
-    Object? banner_image = freezed,
+    Object? profileImage = freezed,
+    Object? bannerImage = freezed,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -105,13 +105,13 @@ class _$BaseInfoCopyWithImpl<$Res, $Val extends BaseInfo>
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
-      profile_image: freezed == profile_image
-          ? _value.profile_image
-          : profile_image // ignore: cast_nullable_to_non_nullable
+      profileImage: freezed == profileImage
+          ? _value.profileImage
+          : profileImage // ignore: cast_nullable_to_non_nullable
               as String?,
-      banner_image: freezed == banner_image
-          ? _value.banner_image
-          : banner_image // ignore: cast_nullable_to_non_nullable
+      bannerImage: freezed == bannerImage
+          ? _value.bannerImage
+          : bannerImage // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
   }
@@ -133,8 +133,8 @@ abstract class _$$BaseInfoImplCopyWith<$Res>
       String birthdate,
       String role,
       String? address,
-      String? profile_image,
-      String? banner_image});
+      String? profileImage,
+      String? bannerImage});
 }
 
 /// @nodoc
@@ -155,8 +155,8 @@ class __$$BaseInfoImplCopyWithImpl<$Res>
     Object? birthdate = null,
     Object? role = null,
     Object? address = freezed,
-    Object? profile_image = freezed,
-    Object? banner_image = freezed,
+    Object? profileImage = freezed,
+    Object? bannerImage = freezed,
   }) {
     return _then(_$BaseInfoImpl(
       name: null == name
@@ -187,13 +187,13 @@ class __$$BaseInfoImplCopyWithImpl<$Res>
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
-      profile_image: freezed == profile_image
-          ? _value.profile_image
-          : profile_image // ignore: cast_nullable_to_non_nullable
+      profileImage: freezed == profileImage
+          ? _value.profileImage
+          : profileImage // ignore: cast_nullable_to_non_nullable
               as String?,
-      banner_image: freezed == banner_image
-          ? _value.banner_image
-          : banner_image // ignore: cast_nullable_to_non_nullable
+      bannerImage: freezed == bannerImage
+          ? _value.bannerImage
+          : bannerImage // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -201,7 +201,7 @@ class __$$BaseInfoImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$BaseInfoImpl with DiagnosticableTreeMixin implements _BaseInfo {
+class _$BaseInfoImpl implements _BaseInfo {
   const _$BaseInfoImpl(
       {required this.name,
       required this.email,
@@ -210,8 +210,8 @@ class _$BaseInfoImpl with DiagnosticableTreeMixin implements _BaseInfo {
       required this.birthdate,
       required this.role,
       this.address,
-      this.profile_image,
-      this.banner_image});
+      this.profileImage,
+      this.bannerImage});
 
   factory _$BaseInfoImpl.fromJson(Map<String, dynamic> json) =>
       _$$BaseInfoImplFromJson(json);
@@ -231,29 +231,13 @@ class _$BaseInfoImpl with DiagnosticableTreeMixin implements _BaseInfo {
   @override
   final String? address;
   @override
-  final String? profile_image;
+  final String? profileImage;
   @override
-  final String? banner_image;
+  final String? bannerImage;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'BaseInfo(name: $name, email: $email, phone: $phone, gender: $gender, birthdate: $birthdate, role: $role, address: $address, profile_image: $profile_image, banner_image: $banner_image)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'BaseInfo'))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('email', email))
-      ..add(DiagnosticsProperty('phone', phone))
-      ..add(DiagnosticsProperty('gender', gender))
-      ..add(DiagnosticsProperty('birthdate', birthdate))
-      ..add(DiagnosticsProperty('role', role))
-      ..add(DiagnosticsProperty('address', address))
-      ..add(DiagnosticsProperty('profile_image', profile_image))
-      ..add(DiagnosticsProperty('banner_image', banner_image));
+  String toString() {
+    return 'BaseInfo(name: $name, email: $email, phone: $phone, gender: $gender, birthdate: $birthdate, role: $role, address: $address, profileImage: $profileImage, bannerImage: $bannerImage)';
   }
 
   @override
@@ -269,16 +253,16 @@ class _$BaseInfoImpl with DiagnosticableTreeMixin implements _BaseInfo {
                 other.birthdate == birthdate) &&
             (identical(other.role, role) || other.role == role) &&
             (identical(other.address, address) || other.address == address) &&
-            (identical(other.profile_image, profile_image) ||
-                other.profile_image == profile_image) &&
-            (identical(other.banner_image, banner_image) ||
-                other.banner_image == banner_image));
+            (identical(other.profileImage, profileImage) ||
+                other.profileImage == profileImage) &&
+            (identical(other.bannerImage, bannerImage) ||
+                other.bannerImage == bannerImage));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, name, email, phone, gender,
-      birthdate, role, address, profile_image, banner_image);
+      birthdate, role, address, profileImage, bannerImage);
 
   @JsonKey(ignore: true)
   @override
@@ -303,8 +287,8 @@ abstract class _BaseInfo implements BaseInfo {
       required final String birthdate,
       required final String role,
       final String? address,
-      final String? profile_image,
-      final String? banner_image}) = _$BaseInfoImpl;
+      final String? profileImage,
+      final String? bannerImage}) = _$BaseInfoImpl;
 
   factory _BaseInfo.fromJson(Map<String, dynamic> json) =
       _$BaseInfoImpl.fromJson;
@@ -324,9 +308,9 @@ abstract class _BaseInfo implements BaseInfo {
   @override
   String? get address;
   @override
-  String? get profile_image;
+  String? get profileImage;
   @override
-  String? get banner_image;
+  String? get bannerImage;
   @override
   @JsonKey(ignore: true)
   _$$BaseInfoImplCopyWith<_$BaseInfoImpl> get copyWith =>

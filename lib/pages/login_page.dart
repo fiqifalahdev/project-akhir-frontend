@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend_tambakku/logic/states.dart';
+import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/pages/loading_page.dart';
 import 'package:frontend_tambakku/pages/register_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
@@ -74,14 +74,14 @@ class _LoginPageState extends State<LoginPage> {
                         });
 
                         ref
-                            .read(authNotifierProvider.notifier)
-                            .loginUser(email.text, password.text)
-                            .then((value) => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const LoadingScreen())))
-                            .catchError((error) {
+                            .read(registrationProvider.notifier)
+                            .login(email.text, password.text)
+                            .then((value) {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoadingScreen()));
+                        }).catchError((error) {
                           print(error);
                           QuickAlert.show(
                             context: context,
@@ -94,6 +94,28 @@ class _LoginPageState extends State<LoginPage> {
                             isLoading = false;
                           });
                         });
+
+                        // ref
+                        //     .read(authNotifierProvider.notifier)
+                        //     .loginUser(email.text, password.text)
+                        //     .then((value) => Navigator.push(
+                        //         context,
+                        //         MaterialPageRoute(
+                        //             builder: (context) =>
+                        //                 const LoadingScreen())))
+                        //     .catchError((error) {
+                        //   print(error);
+                        //   QuickAlert.show(
+                        //     context: context,
+                        //     type: QuickAlertType.error,
+                        //     title: "Error",
+                        //     text: "Email atau Password Salah",
+                        //   );
+
+                        //   setState(() {
+                        //     isLoading = false;
+                        //   });
+                        // });
                       }
                     },
                     style: ElevatedButton.styleFrom(

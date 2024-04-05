@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend_tambakku/logic/main_states.dart';
-import 'package:frontend_tambakku/models/base_info.dart';
+import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/pages/home_page.dart';
 import 'package:frontend_tambakku/pages/profile_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'dart:math' as math;
+
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Layout extends ConsumerStatefulWidget {
   const Layout({super.key});
@@ -33,6 +34,16 @@ class _LayoutState extends ConsumerState<Layout> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(tokenProvider).when(
+        data: (data) => data,
+        error: (error, stackTrace) {
+          throw Exception("Error: $error");
+        },
+        loading: () {
+          return LoadingAnimationWidget.discreteCircle(
+              color: CustomColors.primary, size: 30);
+        });
+
     return SafeArea(
         child: Scaffold(
       appBar: selectedIndex == 0 ? customAppBar() : null,
@@ -84,18 +95,17 @@ class _LayoutState extends ConsumerState<Layout> {
   }
 
   PreferredSizeWidget customAppBar() {
-
-    final data = ref.watch(getUserDataProvider);
+    final data = ref.watch(getBaseInfoProvider);
 
     return PreferredSize(
-      preferredSize: const Size.fromHeight(138),
-      child:  Padding(
+        preferredSize: const Size.fromHeight(138),
+        child: Padding(
           padding: const EdgeInsets.only(top: 38, left: 20),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
@@ -126,8 +136,7 @@ class _LayoutState extends ConsumerState<Layout> {
               ),
             ],
           ),
-        )
-    );
+        ));
   }
 
   Widget buildNavItem(IconData icon, String label, int index) {

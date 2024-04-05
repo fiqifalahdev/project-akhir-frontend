@@ -1,7 +1,7 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend_tambakku/logic/states.dart';
+import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/models/user.dart';
 import 'package:frontend_tambakku/pages/layout.dart';
 import 'package:frontend_tambakku/util/styles.dart';
@@ -171,8 +171,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 )),
           ),
-          Consumer(
-            builder: (context, ref, child) => Container(
+          Consumer(builder: (context, ref, child) {
+            ref.watch(registrationProvider);
+            return Container(
                 width: MediaQuery.of(context).size.width * 0.5,
                 color: CustomColors.primary,
                 height: 55,
@@ -183,19 +184,19 @@ class _RegisterPageState extends State<RegisterPage> {
                       setState(() {
                         isLoading = true;
                       });
+
                       final user = User(
                           name: name.text,
                           email: email.text,
                           password: password.text,
-                          password_confirmation: passwordConfirmation.text,
+                          passwordConfirmation: passwordConfirmation.text,
                           phone: phoneNumber.text,
                           birthdate: birthdate.text,
                           gender: gender);
 
-                      // Call the registerUser method from the AuthNotifier
                       ref
-                          .read(authNotifierProvider.notifier)
-                          .registerUser(user)
+                          .read(registrationProvider.notifier)
+                          .register(user)
                           .then((value) {
                         // Set isLoading to false
                         setState(() {
@@ -214,7 +215,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const Layout()));
-                      }).catchError((value) {
+                      }).catchError((error) {
                         // Set isLoading to false
                         setState(() {
                           isLoading = false;
@@ -224,8 +225,44 @@ class _RegisterPageState extends State<RegisterPage> {
                             context: context,
                             type: QuickAlertType.error,
                             title: "Gagal",
-                            text: "Pendaftaran Gagal");
+                            text:
+                                "Pendaftaran Gagal, Cek kembali data anda : $error");
                       });
+
+                      // Call the registerUser method from the AuthNotifier
+                      // ref
+                      //     .read(authNotifierProvider.notifier)
+                      //     .registerUser(user)
+                      //     .then((value) {
+                      //   // Set isLoading to false
+                      //   setState(() {
+                      //     isLoading = false;
+                      //   });
+                      //   // Show the response from the server
+                      //   QuickAlert.show(
+                      //       context: context,
+                      //       type: QuickAlertType.success,
+                      //       title: "Berhasil",
+                      //       text: "Pendaftaran Berhasil");
+
+                      //   // Navigate to Homepage
+
+                      //   Navigator.pushReplacement(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //           builder: (context) => const Layout()));
+                      // }).catchError((value) {
+                      //   // Set isLoading to false
+                      //   setState(() {
+                      //     isLoading = false;
+                      //   });
+                      //   // Show the response from the server
+                      //   QuickAlert.show(
+                      //       context: context,
+                      //       type: QuickAlertType.error,
+                      //       title: "Gagal",
+                      //       text: "Pendaftaran Gagal");
+                      // });
                     }
                   },
                   child: isLoading
@@ -245,8 +282,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                 color: Colors.white, size: 20)
                           ],
                         ),
-                )),
-          ),
+                ));
+          }),
         ],
       ),
     );

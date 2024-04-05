@@ -1,16 +1,9 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend_tambakku/logic/main_states.dart';
-import 'package:frontend_tambakku/models/base_info.dart';
+import 'package:frontend_tambakku/logic/states_new.dart';
+import 'package:frontend_tambakku/pages/update_profile_page.dart';
+import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:frontend_tambakku/util/styles.dart';
-import 'dart:math' as math;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -40,7 +33,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget customAppBar() {
     return Consumer(builder: (context, ref, child) {
-      final data = ref.watch(getUserDataProvider);
+      final data = ref.watch(getBaseInfoProvider);
+      print(data);
       return Padding(
         padding: const EdgeInsets.only(bottom: 19),
         child: Stack(
@@ -71,9 +65,17 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
                               )),
-                          IconButton(onPressed: () {
-                          //   Nanti navigator push ke halaman edit profile
-                          }, icon: const Icon(Icons.edit, color: CustomColors.primary))
+                          IconButton(
+                              onPressed: () {
+                                //   Nanti navigator push ke halaman edit profile
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            UpdateProfilePage(data)));
+                              },
+                              icon: const Icon(Icons.edit,
+                                  color: CustomColors.primary))
                         ],
                       ),
                     ),
@@ -82,8 +84,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     Text(
                       data.role ?? "Pembudidaya",
-                      style:
-                          const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   ],
                 )),
@@ -99,15 +101,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: ClipOval(
                   child: SizedBox.fromSize(
                       size: const Size.fromRadius(48),
-                      child:
-                      data.profile_image == null
+                      child: data.profileImage == null
                           ? Image.asset(
                               "lib/assets/profile-avatar.jpg",
                               fit: BoxFit.cover,
                             )
-                          :
-                      Image.asset( // fetch gambar dari storage laravel
-                              "lib/assets/petambak.jpg",
+                          : Image.network(
+                              // set the domain image
+                              MainUtil().publicDomain + data.profileImage!,
                               fit: BoxFit.cover,
                             )),
                 ),

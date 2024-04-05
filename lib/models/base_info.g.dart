@@ -15,8 +15,8 @@ _$BaseInfoImpl _$$BaseInfoImplFromJson(Map<String, dynamic> json) =>
       birthdate: json['birthdate'] as String,
       role: json['role'] as String,
       address: json['address'] as String?,
-      profile_image: json['profile_image'] as String?,
-      banner_image: json['banner_image'] as String?,
+      profileImage: json['profileImage'] as String?,
+      bannerImage: json['bannerImage'] as String?,
     );
 
 Map<String, dynamic> _$$BaseInfoImplToJson(_$BaseInfoImpl instance) =>
@@ -28,6 +28,6 @@ Map<String, dynamic> _$$BaseInfoImplToJson(_$BaseInfoImpl instance) =>
       'birthdate': instance.birthdate,
       'role': instance.role,
       'address': instance.address,
-      'profile_image': instance.profile_image,
-      'banner_image': instance.banner_image,
+      'profileImage': instance.profileImage,
+      'bannerImage': instance.bannerImage,
     };

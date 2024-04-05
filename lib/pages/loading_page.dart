@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend_tambakku/logic/main_states.dart';
-import 'package:frontend_tambakku/logic/states.dart';
-import 'package:frontend_tambakku/models/base_info.dart';
+import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/pages/layout.dart';
 import 'package:frontend_tambakku/pages/login_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
@@ -25,11 +23,7 @@ class LoadingScreen extends ConsumerStatefulWidget {
 ///
 class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   Future<void> _getBaseInfo() async {
-    final String token =
-        await ref.read(authNotifierProvider.notifier).getToken();
-
-    // Fetch base info
-     final response = ref.watch(getBaseInfoProvider(token));
+    final token = await ref.watch(tokenProvider.future);
 
     // Cek apakah token sudah ada belum jika ada arahkan ke Homepage jika belum ke login
     token.isEmpty
@@ -47,19 +41,12 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
                   MaterialPageRoute(builder: (context) => const Layout()));
             },
           );
-    print(token);
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-    _getBaseInfo();
   }
 
   @override
   Widget build(BuildContext context) {
+    _getBaseInfo();
+
     return Scaffold(
         body: Stack(children: [
       Image.asset(

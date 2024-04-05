@@ -1,41 +1,45 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter/foundation.dart';
+class User {
+  final String name;
+  final String email;
+  final String? password;
+  final String? passwordConfirmation;
+  final String phone;
+  final String birthdate;
+  final String gender;
 
-part 'user.freezed.dart';
+  User({
+    required this.name,
+    required this.email,
+    required this.password,
+    required this.passwordConfirmation,
+    required this.phone,
+    required this.birthdate,
+    required this.gender,
+  });
 
-part 'user.g.dart';
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      name: json['name'] as String,
+      email: json['email'] as String,
+      password: json['password'] != null ? json['password'] as String : '',
+      passwordConfirmation: json['password_confirmation'] != null
+          ? json['password_confirmation'] as String
+          : '',
+      phone: json['phone'] as String,
+      birthdate: json['birthdate'] as String,
+      gender: json['gender'] as String,
+    );
+  }
 
-@freezed
-class User with _$User {
-  const factory User(
-      {required String name,
-      required String email,
-      required String? password,
-      required String? password_confirmation,
-      required String phone,
-      required String gender,
-      required String birthdate,
-      String? role,
-      String? address,
-      String? about,
-      String? profile_image,
-      String? banner_image}) = _User;
-
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'email': email,
+      'password': password,
+      'password_confirmation': passwordConfirmation,
+      'phone': phone,
+      'birthdate': birthdate,
+      'gender': gender
+    };
+  }
 }
-
-// factory User.fromJson(Map<String, dynamic> json) {
-// return User(
-// name: json['name'],
-// email: json['email'],
-// password: json['password'] ?? '',
-// password_confirmation: json['password_confirmation'] ?? '',
-// phone: json['phone'],
-// gender: json['gender'],
-// birthdate: json['birthdate'],
-// address: json['address'] ?? '',
-// about: json['about'] ?? '',
-// profileImage: json['profile_image'] ?? '',
-// bannerImage: json['banner_image'] ?? ''
-// );
-// }
