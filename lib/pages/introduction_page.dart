@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_tambakku/pages/login_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 
 // ================== Introduction Page ===================
@@ -37,7 +38,12 @@ class _IntroductionPageState extends State<IntroductionPage> {
             Padding(
               padding: const EdgeInsets.all(15),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()));
+                },
                 style: ElevatedButton.styleFrom(
                   textStyle: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold),
