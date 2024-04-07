@@ -41,13 +41,17 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
     String address =
         "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.postalCode}, ${placemark.country}";
 
-    ref.read(addressProvider.notifier).setAddress(address);
-
-    print("Address : ${ref.watch(addressProvider)}");
+    ref.read(addressProvider.notifier).setAddress({
+      'address': address.toString(),
+      'latitude': location.latitude.toString(),
+      'longitude': location.longitude.toString()
+    });
   }
 
   Future<void> _getBaseInfo() async {
-    final token = await ref.watch(tokenProvider.future);
+    final token = ref.watch(tokenProvider);
+
+    print("Token dari Loading Screen : $token");
 
     // Cek apakah token sudah ada belum jika ada arahkan ke Homepage jika belum ke login
     token.isEmpty

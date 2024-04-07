@@ -1,9 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
+import 'package:frontend_tambakku/pages/login_page.dart';
 import 'package:frontend_tambakku/pages/update_profile_page.dart';
 import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:frontend_tambakku/util/styles.dart';
+import 'package:quickalert/quickalert.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -65,17 +69,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
                               )),
-                          IconButton(
-                              onPressed: () {
-                                //   Nanti navigator push ke halaman edit profile
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            UpdateProfilePage(data)));
-                              },
-                              icon: const Icon(Icons.edit,
-                                  color: CustomColors.primary))
                         ],
                       ),
                     ),
@@ -148,62 +141,94 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         // Button Navigation Profile //
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            ElevatedButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.location_on_outlined,
-                                color: CustomColors.primary,
-                                size: 20,
-                              ),
-                              label: const Text(
-                                "Lihat Lokasi",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 14),
-                              ),
+                            TextButton.icon(
+                              onPressed: () {
+                                //   Nanti navigator push ke halaman edit profile
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            UpdateProfilePage(data)));
+                              },
                               style: ButtonStyle(
-                                  padding: const MaterialStatePropertyAll<
-                                          EdgeInsets>(
-                                      EdgeInsets.symmetric(
-                                          horizontal: 15, vertical: 5)),
-                                  backgroundColor:
-                                      const MaterialStatePropertyAll<Color>(
-                                          Colors.white),
-                                  shape: MaterialStatePropertyAll<
-                                          RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8)))),
+                                  backgroundColor: MaterialStateProperty.all(
+                                      CustomColors.primary),
+                                  padding: MaterialStateProperty.all(
+                                    const EdgeInsets.symmetric(
+                                        vertical: 5, horizontal: 15),
+                                  ),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  )),
+                              icon: const Icon(
+                                Icons.edit,
+                                color: CustomColors.putih,
+                                size: 22,
+                              ),
+                              label: const Text("Edit",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 14)),
                             ),
                             const SizedBox(
                               width: 10,
                             ),
-                            ElevatedButton.icon(
-                                onPressed: () {},
-                                style: ButtonStyle(
-                                    padding: const MaterialStatePropertyAll<
-                                            EdgeInsets>(
-                                        EdgeInsets.symmetric(
-                                            horizontal: 15, vertical: 5)),
-                                    backgroundColor:
-                                        const MaterialStatePropertyAll<Color>(
-                                            Colors.white),
-                                    shape: MaterialStatePropertyAll<
-                                            RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8)))),
-                                icon: const Icon(
-                                  Icons.event_available,
-                                  color: CustomColors.primary,
-                                  size: 20,
+                            TextButton.icon(
+                              onPressed: () {
+                                ref
+                                    .read(registrationProvider.notifier)
+                                    .logout()
+                                    .then((value) {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Berhasil",
+                                    text: value ?? "Berhasil Keluar",
+                                    onConfirmBtnTap: () {
+                                      Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const LoginPage()));
+                                    },
+                                  );
+                                }).catchError((error) {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: "Error",
+                                    text: "Terdapat Kesalahan pada Server!",
+                                  );
+                                });
+                              },
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all(Colors.red),
+                                  padding: MaterialStateProperty.all(
+                                    const EdgeInsets.symmetric(
+                                        vertical: 5, horizontal: 15),
+                                  ),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  )),
+                              icon: const Icon(
+                                Icons.logout_rounded,
+                                color: CustomColors.putih,
+                                size: 22,
+                              ),
+                              label: const Text(
+                                "Keluar",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
                                 ),
-                                label: const Text(
-                                  "Buat Pertemuan",
-                                  style: TextStyle(
-                                      color: Colors.black, fontSize: 14),
-                                ))
+                              ),
+                            )
                           ],
                         ),
                       ]),

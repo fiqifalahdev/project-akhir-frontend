@@ -34,15 +34,7 @@ class _LayoutState extends ConsumerState<Layout> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(tokenProvider).when(
-        data: (data) => data,
-        error: (error, stackTrace) {
-          throw Exception("Error: $error");
-        },
-        loading: () {
-          return LoadingAnimationWidget.discreteCircle(
-              color: CustomColors.primary, size: 30);
-        });
+    ref.watch(tokenProvider);
 
     return SafeArea(
         child: Scaffold(

@@ -16,9 +16,15 @@ class MainUtil {
   // login user
   String get loginUrl => '${_baseUrl}login';
 
+  // logout user
+  String get logoutUrl => '${_baseUrl}logout';
+
   // Get base info
   String get baseInfo => '${_baseUrl}profiles';
 
   // Update Profile data
   String get updateProfile => '${_baseUrl}profiles?_method=PUT';
+
+  // Post user location
+  String get postLocation => '${_baseUrl}store/location';
 }

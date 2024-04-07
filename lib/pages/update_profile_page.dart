@@ -316,7 +316,7 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
           height: 20,
         ),
         ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               setState(() {
                 isLoading = true;
 
@@ -334,10 +334,7 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                   profileImage.path.isNotEmpty) {
                 // hit API update profile ke backend
 
-                String token = ref.watch(tokenProvider).when(
-                    data: (data) => data,
-                    error: (error, stackTrace) => error.toString(),
-                    loading: () => "Loading");
+                final token = await ref.watch(tokenProvider);
 
                 ref.read(getBaseInfoProvider.notifier).updateProfile({
                   "name": nameController.text.isEmpty

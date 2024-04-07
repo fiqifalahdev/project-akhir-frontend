@@ -26,14 +26,15 @@ Map<String, String> headers = {
 // Make a registration provider
 final registrationProvider = StateNotifierProvider<RegistrationState, User>(
   // Call the notifier here
-  (ref) => RegistrationState(),
+  (ref) => RegistrationState(ref),
 );
 
 // Define a state notifier to manage the registration process
 class RegistrationState extends StateNotifier<User> {
+  final Ref ref;
   // Default state in constructor
-  RegistrationState()
-      : super(User(
+  RegistrationState(this.ref)
+      : super(const User(
             name: '',
             email: '',
             password: '',
@@ -92,9 +93,10 @@ class RegistrationState extends StateNotifier<User> {
         final String token = jsonDecode(response.body)['token'];
 
         // save token to shared preferences
-        final prefs = await SharedPreferences.getInstance();
+        // final prefs = await SharedPreferences.getInstance();
 
-        prefs.setString('token', token);
+        // prefs.setString('token', token);
+        ref.read(tokenProvider.notifier).setToken(token);
       } else {
         // Registration failed
         throw Exception("Failed to login user: ${response.body}");
@@ -104,23 +106,90 @@ class RegistrationState extends StateNotifier<User> {
       throw Exception('Failed to login user: $error');
     }
   }
+
+  // Define a method to logout a user
+  Future<String> logout() async {
+    try {
+      // final prefs = await SharedPreferences.getInstance();
+      // final token = prefs.get('token');
+      final token = ref.watch(tokenProvider);
+
+      final response = await http.post(Uri.parse(MainUtil().logoutUrl),
+          headers: {'Authorization': 'Bearer $token'});
+
+      final json = jsonDecode(response.body);
+
+      print(json);
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        // if the response is not successful, throw an exception
+        throw Exception("Failed to logout user: ${json['message']}");
+      }
+
+      if (response.statusCode == 401) {
+        throw Exception("Internal Server Error : User unauthenticated");
+      }
+      // prefs.remove('token');
+
+      ref.read(tokenProvider.notifier).removeToken();
+      state = state.copyWith(
+          name: '',
+          email: '',
+          password: '',
+          passwordConfirmation: '',
+          phone: '',
+          birthdate: '',
+          gender: '');
+
+      print(state);
+
+      return json['message'];
+    } catch (error) {
+      throw Exception('Failed to logout user: $error');
+    }
+  }
 }
 
 // =================================================================================
 // =================================== Token Provider ==============================
 // =================================================================================
 
+final tokenProvider = StateNotifierProvider<TokenProviderState, String>(
+    (ref) => TokenProviderState(ref));
+
+class TokenProviderState extends StateNotifier<String> {
+  final Ref ref;
+
+  TokenProviderState(this.ref) : super('');
+
+  Future<void> setToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+
+    ref.read(getBaseInfoProvider.notifier).getBaseInfo(token);
+
+    state = token;
+  }
+
+  Future<void> removeToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+
+    state = '';
+  }
+}
+
 // Make a token provider;
-final tokenProvider = FutureProvider<String>((ref) async {
-  final prefs = await SharedPreferences.getInstance();
-  String token = prefs.getString('token') ?? '';
+// final tokenProvider = FutureProvider<String>((ref) async {
+//   final prefs = await SharedPreferences.getInstance();
+//   String token = prefs.getString('token') ?? '';
 
-  print("Token : $token");
+//   print("Token : $token");
 
-  ref.read(getBaseInfoProvider.notifier).getBaseInfo(token);
+//   ref.read(getBaseInfoProvider.notifier).getBaseInfo(token);
 
-  return token;
-});
+//   return token;
+// });
 
 // =================================================================================
 // =================================== Base Info ===================================
@@ -270,13 +339,56 @@ class FileProvider extends StateNotifier<File> {
 // =================================================================================
 
 final addressProvider = StateNotifierProvider<AddressProvider, String>((ref) {
-  return AddressProvider();
+  return AddressProvider(ref);
 });
 
 class AddressProvider extends StateNotifier<String> {
-  AddressProvider() : super('');
+  final Ref ref;
 
-  void setAddress(String address) {
-    state = address;
+  AddressProvider(this.ref) : super('');
+
+  // Get http method to post a location address to server
+  void setAddress(Map<String, dynamic> params) async {
+    Map<String, dynamic> body = {
+      'address': params['address'],
+      'latitude': params['latitude'],
+      'longitude': params['longitude'],
+    };
+
+    // final prefs = await SharedPreferences.getInstance();
+    // final token = prefs.get('token');
+
+    final token = ref.watch(tokenProvider);
+
+    Map<String, String> tokenMap = {"Authorization": "Bearer $token"};
+
+    headers.addEntries(tokenMap.entries);
+
+    print("=====================================");
+    print("Headers: $headers");
+    print("Body: $body");
+    print("Token: $token");
+    print("=====================================");
+
+    // Make a post request to the server
+    final response = await http.post(Uri.parse(MainUtil().postLocation),
+        headers: headers, body: jsonEncode(body));
+
+    print("response.body: ${response.body}");
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception("Gagal untuk mengambil lokasi: ${response.body}");
+    }
+
+    if (response.statusCode == 401) {
+      throw Exception("Internal Server Error : User unauthenticated");
+    }
+
+    final json = jsonDecode(response.body);
+
+    print("json: $json");
+
+    // Update the state with the address
+    state = params['address'];
   }
 }
