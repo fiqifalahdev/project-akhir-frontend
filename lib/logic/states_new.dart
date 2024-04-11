@@ -355,6 +355,9 @@ class AddressProvider extends StateNotifier<String> {
       'longitude': params['longitude'],
     };
 
+    ref.read(locationProvider.notifier).setLongLat(
+        double.parse(params['latitude']), double.parse(params['longitude']));
+
     // final prefs = await SharedPreferences.getInstance();
     // final token = prefs.get('token');
 
@@ -364,17 +367,15 @@ class AddressProvider extends StateNotifier<String> {
 
     headers.addEntries(tokenMap.entries);
 
-    print("=====================================");
-    print("Headers: $headers");
-    print("Body: $body");
-    print("Token: $token");
-    print("=====================================");
+    // print("=====================================");
+    // print("Headers: $headers");
+    // print("Body: $body");
+    // print("Token: $token");
+    // print("=====================================");
 
     // Make a post request to the server
     final response = await http.post(Uri.parse(MainUtil().postLocation),
         headers: headers, body: jsonEncode(body));
-
-    print("response.body: ${response.body}");
 
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception("Gagal untuk mengambil lokasi: ${response.body}");
@@ -386,9 +387,37 @@ class AddressProvider extends StateNotifier<String> {
 
     final json = jsonDecode(response.body);
 
-    print("json: $json");
-
     // Update the state with the address
     state = params['address'];
+  }
+}
+
+// =================================================================================
+// =============================== Location Provider ==============================
+// =================================================================================
+
+final locationProvider =
+    StateNotifierProvider<LocationProvider, Map<String, double>>((ref) {
+  return LocationProvider(ref);
+});
+
+class LocationProvider extends StateNotifier<Map<String, double>> {
+  final Ref ref;
+
+  LocationProvider(this.ref)
+      : super({
+          'latitude': 0.0,
+          'longitude': 0.0,
+        });
+
+  // Get Longitude latitude from user location
+  void setLongLat(double latitude, double longitude) async {
+    state = {
+      'latitude': latitude,
+      'longitude': longitude,
+    };
+
+    print("Latitude: $latitude, Longitude: $longitude");
+    print("State : $state");
   }
 }

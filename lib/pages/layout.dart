@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/pages/home_page.dart';
+import 'package:frontend_tambakku/pages/maps_page.dart';
 import 'package:frontend_tambakku/pages/profile_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'dart:math' as math;
@@ -20,7 +21,6 @@ class _LayoutState extends ConsumerState<Layout> {
 
   final List<Widget> _page = [
     const Homepage(),
-    const Center(child: Text("OKE")),
     const Center(child: Text("Harga Ikan")),
     const ProfilePage(),
   ];
@@ -40,11 +40,19 @@ class _LayoutState extends ConsumerState<Layout> {
         child: Scaffold(
       appBar: selectedIndex == 0 ? customAppBar() : null,
       body: SingleChildScrollView(
-          padding: selectedIndex != 3
+          padding: selectedIndex == 0
               ? const EdgeInsets.symmetric(horizontal: 20.0)
               : const EdgeInsets.symmetric(horizontal: 0),
           // nanti wrap pake container
-          child: Container(child: _page.elementAt(selectedIndex))),
+          child: Column(
+            children: [
+              if (selectedIndex == 0) ...[const Homepage()],
+              if (selectedIndex == 2) ...[
+                const Center(child: Text("Harga Ikan"))
+              ],
+              if (selectedIndex == 3) ...[const ProfilePage()]
+            ],
+          )),
       bottomNavigationBar: SafeArea(
         child: Container(
             width: MediaQuery.of(context).size.width,
@@ -133,11 +141,20 @@ class _LayoutState extends ConsumerState<Layout> {
 
   Widget buildNavItem(IconData icon, String label, int index) {
     return InkWell(
-      onTap: () {
+      onTap: () async {
         // Handle navigation when the item is tapped
         setState(() {
           selectedIndex = index;
         });
+
+        if (selectedIndex == 1) {
+          final result = await Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const MapsPage()));
+
+          setState(() {
+            selectedIndex = result;
+          });
+        }
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

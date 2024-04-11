@@ -51,8 +51,6 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   Future<void> _getBaseInfo() async {
     final token = ref.watch(tokenProvider);
 
-    print("Token dari Loading Screen : $token");
-
     // Cek apakah token sudah ada belum jika ada arahkan ke Homepage jika belum ke login
     token.isEmpty
         ? Future.delayed(
