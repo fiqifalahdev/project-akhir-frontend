@@ -406,8 +406,8 @@ class LocationProvider extends StateNotifier<Map<String, double>> {
 
   LocationProvider(this.ref)
       : super({
-          'latitude': 0.0,
-          'longitude': 0.0,
+          'latitude': -7.445035578944926,
+          'longitude': 112.65081468165897,
         });
 
   // Get Longitude latitude from user location
@@ -419,5 +419,34 @@ class LocationProvider extends StateNotifier<Map<String, double>> {
 
     print("Latitude: $latitude, Longitude: $longitude");
     print("State : $state");
+  }
+}
+
+final userLocationProvider =
+    StateNotifierProvider<UserLocation, List<dynamic>>((ref) {
+  return UserLocation(ref);
+});
+
+class UserLocation extends StateNotifier<List<dynamic>> {
+  final Ref ref;
+
+  UserLocation(this.ref) : super([]);
+
+  void getUserLocation(String token) async {
+    try {
+      final tokenEntries = <String, String>{'Authorization': 'Bearer $token'};
+      headers.addEntries(tokenEntries.entries);
+
+      final response =
+          await http.get(Uri.parse(MainUtil().getLocation), headers: headers);
+
+      final json = jsonDecode(response.body);
+
+      state = json['data'];
+
+      print("State : $state");
+    } catch (e) {
+      throw Exception('Failed to get user location: $e');
+    }
   }
 }
