@@ -25,7 +25,6 @@ class _MapsPageState extends ConsumerState<MapsPage>
   late double? lat;
   late double? long;
   // Nearby User data
-  late final nearbyUser = ref.watch(userLocationProvider);
   final List<Marker> markers = [];
 
   // MapController controller = MapController();
@@ -53,42 +52,10 @@ class _MapsPageState extends ConsumerState<MapsPage>
   }
 
   // function for fetching the nearby user location
-  void _getNearbyUserLocation() async {
+  _getNearbyUserLocation() async {
     final token = ref.watch(tokenProvider);
 
     ref.read(userLocationProvider.notifier).getUserLocation(token);
-
-    for (var user in nearbyUser) {
-      print("User : $user");
-      final coordinates = user['coordinates'];
-
-      markers.add(Marker(
-          width: 35,
-          height: 35,
-          point: LatLng(
-            double.parse(coordinates['latitude']),
-            double.parse(coordinates['longitude']),
-          ),
-          child: GestureDetector(
-            onTap: () {
-              print("Marker tapped from nearby user");
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(50),
-                boxShadow: const [CustomColors.boxShadow],
-              ),
-              child: const Icon(
-                Icons.account_circle_rounded,
-                color: CustomColors.primary,
-                size: 30.0,
-              ),
-            ),
-          )));
-
-      print("Markers : $markers");
-    }
   }
 
   @override
@@ -103,7 +70,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     _getUserLonglat();
-    _getNearbyUserLocation();
+    _getNearbyUserLocation(); //
   }
 
   @override
@@ -112,9 +79,6 @@ class _MapsPageState extends ConsumerState<MapsPage>
       body: SafeArea(
         child: Stack(
           children: [
-            const Center(
-              child: Text("OKE"),
-            ),
             Positioned(
                 top: 0,
                 left: 0,
@@ -178,7 +142,39 @@ class _MapsPageState extends ConsumerState<MapsPage>
                                   final data = [{userId: xx, coordinates: LatLng(lat, long)}, ... etc];
                                */
                             // ==============================================
-                            ...markers,
+
+                            // BUG = Cannot show the markers on the map on the first render
+
+                            for (var user
+                                in ref.watch(userLocationProvider)) ...[
+                              Marker(
+                                width: 35.0,
+                                height: 35.0,
+                                point: LatLng(
+                                    double.parse(
+                                        user['coordinates']['latitude']),
+                                    double.parse(
+                                        user['coordinates']['longitude'])),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    print("Marker tapped");
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(50),
+                                        boxShadow: const [
+                                          CustomColors.boxShadow
+                                        ]),
+                                    child: const Icon(
+                                      Icons.account_circle_rounded,
+                                      color: CustomColors.primary,
+                                      size: 30.0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                         RichAttributionWidget(
