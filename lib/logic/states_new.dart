@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/models/base_info.dart';
+import 'package:frontend_tambakku/models/feeds.dart';
 import 'package:frontend_tambakku/models/user.dart';
 import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:http/http.dart' as http;
@@ -447,6 +448,82 @@ class UserLocation extends StateNotifier<List<dynamic>> {
       print("State : $state");
     } catch (e) {
       throw Exception('Failed to get user location: $e');
+    }
+  }
+}
+
+// =================================================================================
+// ================================= Feeds Provider ================================
+// =================================================================================
+
+final feedProvider = StateNotifierProvider<Feeds, Feed>((ref) {
+  return Feeds(ref);
+});
+
+class Feeds extends StateNotifier<Feed> {
+  final Ref ref;
+
+  Feeds(this.ref) : super(const Feed(caption: '', image: ''));
+
+  Future<String> postFeed(String caption, File image) async {
+    print("Caption : $caption");
+    print("Image : $image");
+    try {
+      // final prefs = await SharedPreferences.getInstance();
+      // final token = prefs.get('token');
+
+      final token = ref.watch(tokenProvider);
+
+      Map<String, String> headers = {
+        'Content-Type': 'multipart/form-data',
+        'Accept': 'application/json',
+        "Authorization": "Bearer $token"
+      };
+
+      Map<String, dynamic> body = {
+        'caption': caption,
+        'image': image.path,
+      };
+
+      print("body : $body");
+
+      // Make a post request to the server
+      final request =
+          http.MultipartRequest('POST', Uri.parse(MainUtil().postFeeds));
+
+      request.headers.addAll(headers);
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'image', // Field name for the file
+          image.path, // Path to the file
+          filename: image.path.split('/').last, // Set the file name
+        ),
+      );
+
+      request.fields.addAll(body.map((key, value) => MapEntry(key, value)));
+
+      final response = await request.send();
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final responseMsg = jsonDecode(await response.stream.bytesToString());
+        print(responseMsg);
+        throw "Gagal Menambahkan Produk : ${responseMsg["message"]}";
+      }
+
+      if (response.statusCode == 401) {
+        throw "Internal Server Error : User unauthenticated";
+      }
+
+      final json = jsonDecode(await response.stream.bytesToString());
+
+      state = state.copyWith(caption: caption, image: image.path);
+
+      print("state : $state");
+
+      return 'Berhasil Menambahkan Produk';
+    } catch (e) {
+      throw e.toString();
     }
   }
 }

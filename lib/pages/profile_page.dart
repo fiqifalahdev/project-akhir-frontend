@@ -1,8 +1,11 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
+import 'package:frontend_tambakku/pages/add_product_page.dart';
 import 'package:frontend_tambakku/pages/login_page.dart';
 import 'package:frontend_tambakku/pages/update_profile_page.dart';
 import 'package:frontend_tambakku/util/main_util.dart';
@@ -17,6 +20,15 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  bool collapsedMenu = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    collapsedMenu = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -27,9 +39,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: CustomColors.putih, boxShadow: [CustomColors.boxShadow]),
             child: customAppBar()),
         // Content Here
-        // Container(
-        //   height: 500,
-        // )
+        Container(
+          height: 500,
+          color: Colors.amber,
+        )
       ],
       // Cek apakah halaman Beranda?/Akun?/Peta?/Harga Ikan
     );
@@ -52,6 +65,29 @@ class _ProfilePageState extends State<ProfilePage> {
                   // nanti kalo ada gambar maka ganti gambar
                   color: Colors.grey,
                 )),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      collapsedMenu = !collapsedMenu;
+                    });
+                  },
+                  icon: const Icon(Icons.more_vert_rounded),
+                  color: CustomColors.putih,
+                  iconSize: 25,
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(CustomColors.primary),
+                    padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10)),
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    )),
+                  )),
+            ),
             Positioned(
                 top: 140,
                 left: 30,
@@ -115,126 +151,174 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Container(
                   padding: const EdgeInsets.only(left: 20, top: 10, right: 20),
                   // color: Colors.amber,
-                  child: Column(
+                  child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const SizedBox(
+                        SizedBox(
                           height: 10,
                         ),
-                        const Text("Produk Unggulan : "),
+                        Text("Produk Unggulan : "),
                         // Produk ikan nanti disini
-                        const Text(
+                        Text(
                           "- Ikan Nila Segar",
                           style: TextStyle(fontSize: 12),
                         ),
-                        const Text(
+                        Text(
                           "- Bibit Ikan Nila",
                           style: TextStyle(fontSize: 12),
                         ),
-                        const Text(
+                        Text(
                           "- Bandeng",
                           style: TextStyle(fontSize: 12),
                         ),
-                        const SizedBox(
+                        SizedBox(
                           height: 5,
                         ),
                         // Button Navigation Profile //
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton.icon(
-                              onPressed: () {
-                                //   Nanti navigator push ke halaman edit profile
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            UpdateProfilePage(data)));
-                              },
-                              style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                      CustomColors.primary),
-                                  padding: MaterialStateProperty.all(
-                                    const EdgeInsets.symmetric(
-                                        vertical: 5, horizontal: 15),
-                                  ),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  )),
-                              icon: const Icon(
-                                Icons.edit,
-                                color: CustomColors.putih,
-                                size: 22,
-                              ),
-                              label: const Text("Edit",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 14)),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            TextButton.icon(
-                              onPressed: () {
-                                ref
-                                    .read(registrationProvider.notifier)
-                                    .logout()
-                                    .then((value) {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Berhasil",
-                                    text: value ?? "Berhasil Keluar",
-                                    onConfirmBtnTap: () {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LoginPage()));
-                                    },
-                                  );
-                                }).catchError((error) {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.error,
-                                    title: "Error",
-                                    text: "Terdapat Kesalahan pada Server!",
-                                  );
-                                });
-                              },
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(Colors.red),
-                                  padding: MaterialStateProperty.all(
-                                    const EdgeInsets.symmetric(
-                                        vertical: 5, horizontal: 15),
-                                  ),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  )),
-                              icon: const Icon(
-                                Icons.logout_rounded,
-                                color: CustomColors.putih,
-                                size: 22,
-                              ),
-                              label: const Text(
-                                "Keluar",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
+                        // More button
                       ]),
                 )),
+            Positioned(
+                top: 335,
+                right: 10,
+                child: Row(
+                  children: [
+                    // Button Tambah Produk
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AddProductPage()));
+                      },
+                      icon:
+                          const Icon(Icons.add, color: Colors.white, size: 20),
+                      label: const Text("Tambah Produk",
+                          style: TextStyle(
+                              color: CustomColors.putih, fontSize: 14)),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(CustomColors.primary),
+                        padding: MaterialStateProperty.all(
+                          const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 10),
+                        ),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
+            if (collapsedMenu)
+              Positioned(
+                top: 65,
+                right: 10,
+                child: Container(
+                  width: 130,
+                  height: 110,
+                  decoration: BoxDecoration(
+                      color: CustomColors.putih,
+                      boxShadow: const [CustomColors.boxShadow],
+                      borderRadius: BorderRadius.circular(10)),
+                  child: menu(),
+                ),
+              ),
           ],
         ),
+      );
+    });
+  }
+
+  Widget menu() {
+    return Consumer(builder: (context, ref, child) {
+      final data = ref.watch(getBaseInfoProvider);
+      print(data);
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          TextButton.icon(
+            onPressed: () {
+              //   Nanti navigator push ke halaman edit profile
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => UpdateProfilePage(data)));
+            },
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(CustomColors.primary),
+                padding: MaterialStateProperty.all(
+                  const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
+                ),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                )),
+            icon: const Icon(
+              Icons.edit,
+              color: CustomColors.putih,
+              size: 22,
+            ),
+            label: const Text("Edit",
+                style: TextStyle(color: Colors.white, fontSize: 14)),
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          TextButton.icon(
+            onPressed: () {
+              ref.read(registrationProvider.notifier).logout().then((value) {
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.success,
+                  title: "Berhasil",
+                  text: value ?? "Berhasil Keluar",
+                  onConfirmBtnTap: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()));
+                  },
+                );
+              }).catchError((error) {
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.error,
+                  title: "Error",
+                  text: "Terdapat Kesalahan pada Server!",
+                );
+              });
+            },
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.red),
+                padding: MaterialStateProperty.all(
+                  const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                ),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                )),
+            icon: const Icon(
+              Icons.logout_rounded,
+              color: CustomColors.putih,
+              size: 22,
+            ),
+            label: const Text(
+              "Keluar",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+          )
+        ],
       );
     });
   }

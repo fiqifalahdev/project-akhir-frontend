@@ -28,4 +28,7 @@ class MainUtil {
   // Post user location
   String get postLocation => '${_baseUrl}store/location';
   String get getLocation => '${_baseUrl}locations';
+
+  // Store Products
+  String get postFeeds => '${_baseUrl}store/feeds';
 }

@@ -47,13 +47,15 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
-        leadingWidth: 60,
-        backgroundColor: CustomColors.primary,
+        elevation: 1,
+        leadingWidth: 50,
+        backgroundColor: Colors.white,
+        shadowColor: Colors.grey[50],
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back_ios_new),
-          iconSize: 20,
-          color: CustomColors.putih,
+          iconSize: 30,
+          color: CustomColors.darkBlue,
         ),
       ),
       body: SingleChildScrollView(
