@@ -1,9 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 
 class LocationServices {
-  late String longitude = '';
-  late String latitude = '';
-
   // Get user location
   Future<Position> getLocation() async {
     bool isServiceEnabled;
@@ -29,14 +26,6 @@ class LocationServices {
         return Future.error('Location permissions are denied');
       }
     }
-
-    longitude = await Geolocator.getCurrentPosition()
-        .then((value) => value.longitude.toString());
-    latitude = await Geolocator.getCurrentPosition()
-        .then((value) => value.latitude.toString());
-
-    print("long: $longitude");
-    print("lat: $latitude");
 
     return await Geolocator.getCurrentPosition();
   }

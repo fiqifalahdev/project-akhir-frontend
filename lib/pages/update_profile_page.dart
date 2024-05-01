@@ -24,15 +24,14 @@ class UpdateProfilePage extends ConsumerStatefulWidget {
 class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
   // Controller Form Update
   late TextEditingController nameController = TextEditingController(text: "");
-  late TextEditingController emailController = TextEditingController(text: "");
   late TextEditingController phoneController = TextEditingController(text: "");
   late String genderController = "Laki-laki";
   late TextEditingController birthdateController =
       TextEditingController(text: "");
-  late String roleController = "pembudidaya";
+  late TextEditingController aboutController = TextEditingController(text: "");
   late TextEditingController addressController =
       TextEditingController(text: "");
-  late File profileImage;
+  late File profileImage = File("");
 
   bool isLoading = false;
 
@@ -47,13 +46,15 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
-        leadingWidth: 60,
-        backgroundColor: CustomColors.primary,
+        elevation: 1,
+        leadingWidth: 50,
+        backgroundColor: Colors.white,
+        shadowColor: Colors.grey[50],
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back_ios_new),
-          iconSize: 20,
-          color: CustomColors.putih,
+          iconSize: 30,
+          color: CustomColors.darkBlue,
         ),
       ),
       body: SingleChildScrollView(
@@ -76,19 +77,23 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                             Border.all(color: CustomColors.primary, width: 5),
                         shape: BoxShape.circle),
                     child: ClipOval(
-                      child: SizedBox.fromSize(
-                          size: const Size.fromRadius(48),
-                          child: widget.data.profileImage == null
-                              ? Image.asset(
-                                  "lib/assets/profile-avatar.jpg",
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.network(
-                                  MainUtil().publicDomain +
-                                      widget.data.profileImage.toString(),
-                                  fit: BoxFit.cover,
-                                )),
-                    ),
+                        child: SizedBox.fromSize(
+                            size: const Size.fromRadius(48),
+                            child: widget.data.profileImage != null
+                                ? Image.network(
+                                    MainUtil().publicDomain +
+                                        widget.data.profileImage.toString(),
+                                    fit: BoxFit.cover,
+                                  )
+                                : profileImage.path.isEmpty
+                                    ? Image.asset(
+                                        "lib/assets/profile-avatar.jpg",
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.file(
+                                        profileImage,
+                                        fit: BoxFit.cover,
+                                      ))),
                   ),
                 ),
                 Positioned(
@@ -110,6 +115,10 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                             // Update Image
 
                             await ref.read(fileProvider.notifier).pickImage();
+
+                            setState(() {
+                              profileImage = ref.watch(fileProvider);
+                            });
                           },
                           icon: const Icon(
                             Icons.edit,
@@ -173,25 +182,6 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                 borderSide: const BorderSide(width: 5),
                 borderRadius: BorderRadius.circular(8)),
             hintText: widget.data.phone ?? "Nomor HP Anda",
-            hintStyle: const TextStyle(color: Colors.grey),
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        formLabel("Email"),
-        const SizedBox(
-          height: 10,
-        ),
-        TextFormField(
-          controller: emailController,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-                borderSide: const BorderSide(width: 5),
-                borderRadius: BorderRadius.circular(8)),
-            hintText: widget.data.email ?? "Email Anda",
             hintStyle: const TextStyle(color: Colors.grey),
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
@@ -268,37 +258,18 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
         const SizedBox(
           height: 10,
         ),
-        formLabel("Peran"),
+        formLabel("Deskripsi bisnis anda"),
         const SizedBox(
           height: 10,
         ),
-        SizedBox(
-            child: DropdownButtonFormField(
-          hint: Text(widget.data.role ?? "Pilih Peran"),
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-          ),
-          items: const [
-            DropdownMenuItem(
-              value: "pembudidaya",
-              child: Text("pembudidaya"),
-            ),
-            DropdownMenuItem(
-              value: "pengepul",
-              child: Text("pengepul"),
-            ),
-          ],
-          onChanged: (value) {
-            roleController = value.toString();
-          },
-          validator: (value) {
-            if (value == null) {
-              return "Peran anda tidak boleh kosong";
-            }
-          },
-        )),
+        TextFormField(
+            controller: aboutController,
+            maxLines: 5,
+            decoration: InputDecoration(
+                border: OutlineInputBorder(
+                    borderSide: const BorderSide(width: 5),
+                    borderRadius: BorderRadius.circular(8)),
+                hintText: widget.data.about ?? "Deskripsi Bisnis Anda")),
         const SizedBox(
           height: 10,
         ),
@@ -316,28 +287,21 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
           height: 20,
         ),
         ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               setState(() {
                 isLoading = true;
-
-                // Cek Data
-                profileImage = ref.watch(fileProvider);
               });
               // // Update Data set data dengan Provider
               if (nameController.text.isNotEmpty ||
                   phoneController.text.isNotEmpty ||
-                  emailController.text.isNotEmpty ||
                   birthdateController.text.isNotEmpty ||
                   genderController.isNotEmpty ||
-                  roleController.isNotEmpty ||
+                  aboutController.text.isNotEmpty ||
                   addressController.text.isNotEmpty ||
                   profileImage.path.isNotEmpty) {
                 // hit API update profile ke backend
 
-                String token = ref.watch(tokenProvider).when(
-                    data: (data) => data,
-                    error: (error, stackTrace) => error.toString(),
-                    loading: () => "Loading");
+                final token = await ref.watch(tokenProvider);
 
                 ref.read(getBaseInfoProvider.notifier).updateProfile({
                   "name": nameController.text.isEmpty
@@ -346,18 +310,15 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                   "phone": phoneController.text.isEmpty
                       ? widget.data.phone
                       : phoneController.text,
-                  "email": emailController.text.isEmpty
-                      ? widget.data.email
-                      : emailController.text,
                   "birthdate": birthdateController.text.isEmpty
                       ? widget.data.birthdate
                       : birthdateController.text,
                   "gender": genderController.isEmpty
                       ? widget.data.gender
                       : genderController,
-                  "role": roleController.isEmpty
-                      ? widget.data.role
-                      : roleController,
+                  "about": aboutController.text.isEmpty
+                      ? widget.data.about
+                      : aboutController.text,
                   "address": addressController.text.isEmpty
                       ? widget.data.address
                       : addressController.text,
@@ -373,14 +334,23 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                       context: context,
                       type: QuickAlertType.success,
                       title: "Berhasil",
-                      text: "Profil berhasil diubah");
-
-                  Future.delayed(const Duration(seconds: 2), () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const Layout()));
+                      text: "Profil berhasil diubah",
+                      onConfirmBtnTap: () => Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Layout(index: 3,),
+                            ),
+                          ));
+                }).catchError((error) {
+                  setState(() {
+                    isLoading = false;
                   });
+
+                  QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.error,
+                      title: "Gagal",
+                      text: "Gagal Mengubah Profil : $error");
                 });
               }
             },

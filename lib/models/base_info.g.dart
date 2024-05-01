@@ -9,11 +9,12 @@ part of 'base_info.dart';
 _$BaseInfoImpl _$$BaseInfoImplFromJson(Map<String, dynamic> json) =>
     _$BaseInfoImpl(
       name: json['name'] as String,
-      email: json['email'] as String,
       phone: json['phone'] as String,
       gender: json['gender'] as String,
       birthdate: json['birthdate'] as String,
-      role: json['role'] as String,
+      email: json['email'] as String?,
+      role: json['role'] as String?,
+      about: json['about'] as String?,
       address: json['address'] as String?,
       profileImage: json['profileImage'] as String?,
       bannerImage: json['bannerImage'] as String?,
@@ -22,11 +23,12 @@ _$BaseInfoImpl _$$BaseInfoImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$BaseInfoImplToJson(_$BaseInfoImpl instance) =>
     <String, dynamic>{
       'name': instance.name,
-      'email': instance.email,
       'phone': instance.phone,
       'gender': instance.gender,
       'birthdate': instance.birthdate,
+      'email': instance.email,
       'role': instance.role,
+      'about': instance.about,
       'address': instance.address,
       'profileImage': instance.profileImage,
       'bannerImage': instance.bannerImage,

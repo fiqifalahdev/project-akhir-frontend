@@ -21,11 +21,12 @@ BaseInfo _$BaseInfoFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$BaseInfo {
   String get name => throw _privateConstructorUsedError;
-  String get email => throw _privateConstructorUsedError;
   String get phone => throw _privateConstructorUsedError;
   String get gender => throw _privateConstructorUsedError;
   String get birthdate => throw _privateConstructorUsedError;
-  String get role => throw _privateConstructorUsedError;
+  String? get email => throw _privateConstructorUsedError;
+  String? get role => throw _privateConstructorUsedError;
+  String? get about => throw _privateConstructorUsedError;
   String? get address => throw _privateConstructorUsedError;
   String? get profileImage => throw _privateConstructorUsedError;
   String? get bannerImage => throw _privateConstructorUsedError;
@@ -43,11 +44,12 @@ abstract class $BaseInfoCopyWith<$Res> {
   @useResult
   $Res call(
       {String name,
-      String email,
       String phone,
       String gender,
       String birthdate,
-      String role,
+      String? email,
+      String? role,
+      String? about,
       String? address,
       String? profileImage,
       String? bannerImage});
@@ -67,11 +69,12 @@ class _$BaseInfoCopyWithImpl<$Res, $Val extends BaseInfo>
   @override
   $Res call({
     Object? name = null,
-    Object? email = null,
     Object? phone = null,
     Object? gender = null,
     Object? birthdate = null,
-    Object? role = null,
+    Object? email = freezed,
+    Object? role = freezed,
+    Object? about = freezed,
     Object? address = freezed,
     Object? profileImage = freezed,
     Object? bannerImage = freezed,
@@ -80,10 +83,6 @@ class _$BaseInfoCopyWithImpl<$Res, $Val extends BaseInfo>
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      email: null == email
-          ? _value.email
-          : email // ignore: cast_nullable_to_non_nullable
               as String,
       phone: null == phone
           ? _value.phone
@@ -97,10 +96,18 @@ class _$BaseInfoCopyWithImpl<$Res, $Val extends BaseInfo>
           ? _value.birthdate
           : birthdate // ignore: cast_nullable_to_non_nullable
               as String,
-      role: null == role
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+      role: freezed == role
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
+      about: freezed == about
+          ? _value.about
+          : about // ignore: cast_nullable_to_non_nullable
+              as String?,
       address: freezed == address
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
@@ -127,11 +134,12 @@ abstract class _$$BaseInfoImplCopyWith<$Res>
   @useResult
   $Res call(
       {String name,
-      String email,
       String phone,
       String gender,
       String birthdate,
-      String role,
+      String? email,
+      String? role,
+      String? about,
       String? address,
       String? profileImage,
       String? bannerImage});
@@ -149,11 +157,12 @@ class __$$BaseInfoImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? name = null,
-    Object? email = null,
     Object? phone = null,
     Object? gender = null,
     Object? birthdate = null,
-    Object? role = null,
+    Object? email = freezed,
+    Object? role = freezed,
+    Object? about = freezed,
     Object? address = freezed,
     Object? profileImage = freezed,
     Object? bannerImage = freezed,
@@ -162,10 +171,6 @@ class __$$BaseInfoImplCopyWithImpl<$Res>
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      email: null == email
-          ? _value.email
-          : email // ignore: cast_nullable_to_non_nullable
               as String,
       phone: null == phone
           ? _value.phone
@@ -179,10 +184,18 @@ class __$$BaseInfoImplCopyWithImpl<$Res>
           ? _value.birthdate
           : birthdate // ignore: cast_nullable_to_non_nullable
               as String,
-      role: null == role
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+      role: freezed == role
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
+      about: freezed == about
+          ? _value.about
+          : about // ignore: cast_nullable_to_non_nullable
+              as String?,
       address: freezed == address
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
@@ -204,11 +217,12 @@ class __$$BaseInfoImplCopyWithImpl<$Res>
 class _$BaseInfoImpl implements _BaseInfo {
   const _$BaseInfoImpl(
       {required this.name,
-      required this.email,
       required this.phone,
       required this.gender,
       required this.birthdate,
-      required this.role,
+      this.email,
+      this.role,
+      this.about,
       this.address,
       this.profileImage,
       this.bannerImage});
@@ -219,15 +233,17 @@ class _$BaseInfoImpl implements _BaseInfo {
   @override
   final String name;
   @override
-  final String email;
-  @override
   final String phone;
   @override
   final String gender;
   @override
   final String birthdate;
   @override
-  final String role;
+  final String? email;
+  @override
+  final String? role;
+  @override
+  final String? about;
   @override
   final String? address;
   @override
@@ -237,7 +253,7 @@ class _$BaseInfoImpl implements _BaseInfo {
 
   @override
   String toString() {
-    return 'BaseInfo(name: $name, email: $email, phone: $phone, gender: $gender, birthdate: $birthdate, role: $role, address: $address, profileImage: $profileImage, bannerImage: $bannerImage)';
+    return 'BaseInfo(name: $name, phone: $phone, gender: $gender, birthdate: $birthdate, email: $email, role: $role, about: $about, address: $address, profileImage: $profileImage, bannerImage: $bannerImage)';
   }
 
   @override
@@ -246,12 +262,13 @@ class _$BaseInfoImpl implements _BaseInfo {
         (other.runtimeType == runtimeType &&
             other is _$BaseInfoImpl &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.email, email) || other.email == email) &&
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.gender, gender) || other.gender == gender) &&
             (identical(other.birthdate, birthdate) ||
                 other.birthdate == birthdate) &&
+            (identical(other.email, email) || other.email == email) &&
             (identical(other.role, role) || other.role == role) &&
+            (identical(other.about, about) || other.about == about) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.profileImage, profileImage) ||
                 other.profileImage == profileImage) &&
@@ -261,8 +278,8 @@ class _$BaseInfoImpl implements _BaseInfo {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, name, email, phone, gender,
-      birthdate, role, address, profileImage, bannerImage);
+  int get hashCode => Object.hash(runtimeType, name, phone, gender, birthdate,
+      email, role, about, address, profileImage, bannerImage);
 
   @JsonKey(ignore: true)
   @override
@@ -281,11 +298,12 @@ class _$BaseInfoImpl implements _BaseInfo {
 abstract class _BaseInfo implements BaseInfo {
   const factory _BaseInfo(
       {required final String name,
-      required final String email,
       required final String phone,
       required final String gender,
       required final String birthdate,
-      required final String role,
+      final String? email,
+      final String? role,
+      final String? about,
       final String? address,
       final String? profileImage,
       final String? bannerImage}) = _$BaseInfoImpl;
@@ -296,15 +314,17 @@ abstract class _BaseInfo implements BaseInfo {
   @override
   String get name;
   @override
-  String get email;
-  @override
   String get phone;
   @override
   String get gender;
   @override
   String get birthdate;
   @override
-  String get role;
+  String? get email;
+  @override
+  String? get role;
+  @override
+  String? get about;
   @override
   String? get address;
   @override

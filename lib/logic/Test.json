@@ -1,0 +1,18 @@
+{
+  "routes": [
+    {
+      "weight_name": "auto",
+      "weight": 264.534,
+      "duration": 244.728,
+      "distance": 1823.964,
+      "legs": [{ "via_waypoints": [], "admins": [{ "iso_3166_1_alpha3": "IDN", "iso_3166_1": "ID" }], "weight": 264.534, "duration": 244.728, "steps": [], "distance": 1823.964, "summary": "" }],
+      "geometry": "hvll@{usnTa@MoAxEmA|CuAvBiB~FLzFjFrFw@|H{EnTfKfBhJvB"
+    }
+  ],
+  "waypoints": [
+    { "distance": 1.342, "name": "", "location": [112.664139, -7.443087] },
+    { "distance": 9.365, "name": "", "location": [112.651818, -7.444808] }
+  ],
+  "code": "Ok",
+  "uuid": "0xgy-Kf_LB8WyjQEEyxmaiT__06LlbIHZS9P22f8Oaevqo-rvrlbzA=="
+}

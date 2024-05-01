@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/models/user.dart';
 import 'package:frontend_tambakku/pages/layout.dart';
+import 'package:frontend_tambakku/pages/loading_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -27,6 +28,7 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController phoneNumber = TextEditingController();
   TextEditingController birthdate = TextEditingController();
   late String gender;
+  late String role;
 
   bool passwordIsVisible = false;
   bool passwordConfirmationIsVisible = false;
@@ -189,10 +191,11 @@ class _RegisterPageState extends State<RegisterPage> {
                           name: name.text,
                           email: email.text,
                           password: password.text,
-                          passwordConfirmation: passwordConfirmation.text,
+                          password_confirmation: passwordConfirmation.text,
                           phone: phoneNumber.text,
                           birthdate: birthdate.text,
-                          gender: gender);
+                          gender: gender,
+                          role: role);
 
                       ref
                           .read(registrationProvider.notifier)
@@ -207,14 +210,14 @@ class _RegisterPageState extends State<RegisterPage> {
                             context: context,
                             type: QuickAlertType.success,
                             title: "Berhasil",
-                            text: "Pendaftaran Berhasil");
+                            text: value,
+                            onConfirmBtnTap: () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const LoadingScreen())));
 
                         // Navigate to Homepage
-
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Layout()));
                       }).catchError((error) {
                         // Set isLoading to false
                         setState(() {
@@ -227,42 +230,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             title: "Gagal",
                             text:
                                 "Pendaftaran Gagal, Cek kembali data anda : $error");
+
+                        print(error);
+                      }).onError((error, stackTrace) {
+                        print("Error : $error, StackTrace : $stackTrace");
                       });
-
-                      // Call the registerUser method from the AuthNotifier
-                      // ref
-                      //     .read(authNotifierProvider.notifier)
-                      //     .registerUser(user)
-                      //     .then((value) {
-                      //   // Set isLoading to false
-                      //   setState(() {
-                      //     isLoading = false;
-                      //   });
-                      //   // Show the response from the server
-                      //   QuickAlert.show(
-                      //       context: context,
-                      //       type: QuickAlertType.success,
-                      //       title: "Berhasil",
-                      //       text: "Pendaftaran Berhasil");
-
-                      //   // Navigate to Homepage
-
-                      //   Navigator.pushReplacement(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //           builder: (context) => const Layout()));
-                      // }).catchError((value) {
-                      //   // Set isLoading to false
-                      //   setState(() {
-                      //     isLoading = false;
-                      //   });
-                      //   // Show the response from the server
-                      //   QuickAlert.show(
-                      //       context: context,
-                      //       type: QuickAlertType.error,
-                      //       title: "Gagal",
-                      //       text: "Pendaftaran Gagal");
-                      // });
                     }
                   },
                   child: isLoading
@@ -504,6 +476,40 @@ class _RegisterPageState extends State<RegisterPage> {
                   validator: (value) {
                     if (value == null) {
                       return "Jenis Kelamin tidak boleh kosong";
+                    }
+                  },
+                )),
+                const SizedBox(height: 15),
+                const Text("Peran",
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
+                // Dropdown
+                SizedBox(
+                    child: DropdownButtonFormField(
+                  hint: const Text("Pilih Peran Anda"),
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: "pembudidaya",
+                      child: Text("Pembudidaya"),
+                    ),
+                    DropdownMenuItem(
+                      value: "pengepul",
+                      child: Text("Pengepul"),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    role = value.toString();
+                    print("Role : $role");
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return "Peran anda tidak boleh kosong";
                     }
                   },
                 )),
