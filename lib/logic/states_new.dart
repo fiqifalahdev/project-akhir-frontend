@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/models/base_info.dart';
 import 'package:frontend_tambakku/models/feeds.dart';
@@ -39,14 +40,16 @@ class RegistrationState extends StateNotifier<User> {
             name: '',
             email: '',
             password: '',
-            passwordConfirmation: '',
+            password_confirmation: '',
             phone: '',
             birthdate: '',
-            gender: ''));
+            gender: '',
+            role: ''));
 
   // Define a method to register a user
-  Future<void> register(User user) async {
+  Future<String> register(User user) async {
     try {
+      print("User : ${user.toJson()}");
       // Perform the registration process here (e.g., make an HTTP request)
       // You can use packages like http or dio to make HTTP requests
       final response = await http.post(
@@ -57,21 +60,24 @@ class RegistrationState extends StateNotifier<User> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Registration successful
-
+        print(jsonDecode(response.body)['data']);
         state = User.fromJson(jsonDecode(response.body)['data']);
+        print(state);
         final String token = jsonDecode(response.body)['token'];
 
         // save token to shared preferences
-        final prefs = await SharedPreferences.getInstance();
+        ref.read(tokenProvider.notifier).setToken(token);
 
-        prefs.setString('token', token);
+        return "Pendaftaran Berhasil!";
       } else {
         // Registration failed
-        throw Exception("Failed to register user: ${response.body}");
+        print(response.body);
+        throw "${jsonDecode(response.body)['message']}";
       }
-    } catch (error) {
+    } catch (error, stackTrace) {
       // Handle any errors that occur during registration
-      throw Exception('Failed to register user: $error');
+      print("Stack Trace : ${stackTrace.toString()}");
+      throw error.toString();
     }
   }
 
@@ -137,7 +143,7 @@ class RegistrationState extends StateNotifier<User> {
           name: '',
           email: '',
           password: '',
-          passwordConfirmation: '',
+          password_confirmation: '',
           phone: '',
           birthdate: '',
           gender: '');
@@ -198,18 +204,20 @@ class TokenProviderState extends StateNotifier<String> {
 // Define a state notifier to manage the base info process
 
 final getBaseInfoProvider = StateNotifierProvider<BaseInfoState, BaseInfo>(
-  (ref) => BaseInfoState(),
+  (ref) => BaseInfoState(ref),
 );
 
 class BaseInfoState extends StateNotifier<BaseInfo> {
-  BaseInfoState()
+  final Ref ref;
+
+  BaseInfoState(this.ref)
       : super(const BaseInfo(
             name: '',
-            email: '',
             phone: '',
             birthdate: '',
             gender: '',
             role: '',
+            about: '',
             profileImage: ''));
 
   Future<void> getBaseInfo(String token) async {
@@ -226,27 +234,34 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
       }
 
       final json = jsonDecode(response.body)['data']['detail'];
+      final feeds = jsonDecode(response.body)['data']['feeds'];
 
-      print(json);
+      print("feeds dari baseInfoProvider : $feeds");
+      print("json baseInfo : $json");
+
+      ref
+          .read(feedProvider.notifier)
+          .getFeeds(feeds); // gabisa ngeread provider
 
       state = state.copyWith(
           name: json['name'],
-          email: json['email'],
           phone: json['phone'],
           gender: json['gender'],
           birthdate: json['birthdate'],
           role: json['role'],
+          about: json['about'],
           profileImage: json['profile_image'],
           address: json['address']);
 
       print(state);
-    } catch (error) {
+    } catch (error, stackTrace) {
+      print("Stack Trace : ${stackTrace.toString()}");
       throw Exception('Failed to get base info: $error');
     }
   }
 
   // Update profile method
-  Future<void> updateProfile(Map<String, dynamic> data, String token) async {
+  Future<String> updateProfile(Map<String, dynamic> data, String token) async {
     try {
       // make a multipart request
       final request =
@@ -273,8 +288,8 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
       data.remove('profile_image');
       request.fields.addAll(data.map((key, value) => MapEntry(key, value)));
 
-      // print("request.fields: ${request.fields}");
-      // print("request.files: ${request.files}");
+      print("request.fields: ${request.fields}");
+      print("request.files: ${request.files}");
 
       final response = await request.send();
 
@@ -287,8 +302,7 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
         state = state.copyWith(
           name: data['name'],
           phone: data['phone'],
-          email: data['email'],
-          role: data['role'],
+          about: data['about'],
           gender: data['gender'],
           birthdate: data['birthdate'],
           address: data['address'],
@@ -296,12 +310,13 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
         );
 
         print(state);
+
+        return json['message'];
       } else {
-        throw Exception(
-            "Failed to update profile: ${await response.stream.bytesToString()}");
+        throw "${jsonDecode(await response.stream.bytesToString())['message']}";
       }
     } catch (e) {
-      throw Exception('Failed to update profile: $e');
+      throw e.toString();
     }
   }
 }
@@ -363,6 +378,7 @@ class AddressProvider extends StateNotifier<String> {
     // final token = prefs.get('token');
 
     final token = ref.watch(tokenProvider);
+    print("Tokwen : $token");
 
     Map<String, String> tokenMap = {"Authorization": "Bearer $token"};
 
@@ -407,8 +423,8 @@ class LocationProvider extends StateNotifier<Map<String, double>> {
 
   LocationProvider(this.ref)
       : super({
-          'latitude': -7.445035578944926,
-          'longitude': 112.65081468165897,
+          'latitude': -7.445035578944926, // default value for latitude
+          'longitude': 112.65081468165897, // default value for longitude
         });
 
   // Get Longitude latitude from user location
@@ -423,6 +439,7 @@ class LocationProvider extends StateNotifier<Map<String, double>> {
   }
 }
 
+// Get Nearby User Location //
 final userLocationProvider =
     StateNotifierProvider<UserLocation, List<dynamic>>((ref) {
   return UserLocation(ref);
@@ -452,19 +469,62 @@ class UserLocation extends StateNotifier<List<dynamic>> {
   }
 }
 
+// MapBox Directions API
+// Url Request : https://api.mapbox.com/directions/v5/{profile}/{coordinates}
+
+final directionProvider =
+    StateNotifierProvider<DirectionState, Map<String, dynamic>>(
+        (ref) => DirectionState(ref));
+
+class DirectionState extends StateNotifier<Map<String, dynamic>> {
+  final Ref ref;
+
+  DirectionState(this.ref) : super({});
+
+  Future<String> getDirectionMapbox(double latDestination,
+      double longDestination, double latCurrent, double longCurrent) async {
+    try {
+      final token = dotenv.env['PUBLIC_ACCESS_TOKEN'];
+
+      final url =
+          'https://api.mapbox.com/directions/v5/mapbox/driving/$longCurrent,$latCurrent;$longDestination,$latDestination?alternatives=true&geometries=geojson&language=id&overview=full&steps=true&access_token=$token';
+
+      final response = await http.get(Uri.parse(url));
+
+      // print('Response : ${response.body}, ${response.statusCode}');
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception("Gagal untuk mendapatkan arah: ${response.body}");
+      }
+
+      final json = jsonDecode(response.body);
+
+      state = json;
+
+      // print(
+      // 'Directions State : ${state['routes'][0]['geometry']}'); // nanti panggiil variable ini
+
+      return 'Berhasil mendapatkan arah';
+    } catch (e) {
+      return e.toString();
+    }
+  }
+}
+
 // =================================================================================
 // ================================= Feeds Provider ================================
 // =================================================================================
 
-final feedProvider = StateNotifierProvider<Feeds, Feed>((ref) {
+final feedProvider = StateNotifierProvider<Feeds, List<Feed>>((ref) {
   return Feeds(ref);
 });
 
-class Feeds extends StateNotifier<Feed> {
+class Feeds extends StateNotifier<List<Feed>> {
   final Ref ref;
 
-  Feeds(this.ref) : super(const Feed(caption: '', image: ''));
+  Feeds(this.ref) : super([]);
 
+  // Store Products Feed to server
   Future<String> postFeed(String caption, File image) async {
     print("Caption : $caption");
     print("Image : $image");
@@ -517,13 +577,20 @@ class Feeds extends StateNotifier<Feed> {
 
       final json = jsonDecode(await response.stream.bytesToString());
 
-      state = state.copyWith(caption: caption, image: image.path);
-
       print("state : $state");
 
       return 'Berhasil Menambahkan Produk';
     } catch (e) {
       throw e.toString();
     }
+  }
+
+  // Get all Feeds from baseInfo Provider
+  void getFeeds(dynamic data) {
+    final feeds = (data as List).map((e) {
+      return Feed.fromJson(e as Map<String, dynamic>);
+    }).toList();
+
+    state = feeds; // Perbaiki baris ini
   }
 }

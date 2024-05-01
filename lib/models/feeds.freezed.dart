@@ -20,8 +20,11 @@ Feed _$FeedFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Feed {
+  int? get id => throw _privateConstructorUsedError;
   String get caption => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
+  int? get user_id => throw _privateConstructorUsedError;
+  String? get created_at => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -33,7 +36,12 @@ abstract class $FeedCopyWith<$Res> {
   factory $FeedCopyWith(Feed value, $Res Function(Feed) then) =
       _$FeedCopyWithImpl<$Res, Feed>;
   @useResult
-  $Res call({String caption, String image});
+  $Res call(
+      {int? id,
+      String caption,
+      String image,
+      int? user_id,
+      String? created_at});
 }
 
 /// @nodoc
@@ -49,10 +57,17 @@ class _$FeedCopyWithImpl<$Res, $Val extends Feed>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = freezed,
     Object? caption = null,
     Object? image = null,
+    Object? user_id = freezed,
+    Object? created_at = freezed,
   }) {
     return _then(_value.copyWith(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int?,
       caption: null == caption
           ? _value.caption
           : caption // ignore: cast_nullable_to_non_nullable
@@ -61,6 +76,14 @@ class _$FeedCopyWithImpl<$Res, $Val extends Feed>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String,
+      user_id: freezed == user_id
+          ? _value.user_id
+          : user_id // ignore: cast_nullable_to_non_nullable
+              as int?,
+      created_at: freezed == created_at
+          ? _value.created_at
+          : created_at // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -72,7 +95,12 @@ abstract class _$$FeedImplCopyWith<$Res> implements $FeedCopyWith<$Res> {
       __$$FeedImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String caption, String image});
+  $Res call(
+      {int? id,
+      String caption,
+      String image,
+      int? user_id,
+      String? created_at});
 }
 
 /// @nodoc
@@ -85,10 +113,17 @@ class __$$FeedImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = freezed,
     Object? caption = null,
     Object? image = null,
+    Object? user_id = freezed,
+    Object? created_at = freezed,
   }) {
     return _then(_$FeedImpl(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int?,
       caption: null == caption
           ? _value.caption
           : caption // ignore: cast_nullable_to_non_nullable
@@ -97,6 +132,14 @@ class __$$FeedImplCopyWithImpl<$Res>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String,
+      user_id: freezed == user_id
+          ? _value.user_id
+          : user_id // ignore: cast_nullable_to_non_nullable
+              as int?,
+      created_at: freezed == created_at
+          ? _value.created_at
+          : created_at // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -104,19 +147,30 @@ class __$$FeedImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$FeedImpl implements _Feed {
-  const _$FeedImpl({required this.caption, required this.image});
+  const _$FeedImpl(
+      {this.id,
+      required this.caption,
+      required this.image,
+      this.user_id,
+      this.created_at});
 
   factory _$FeedImpl.fromJson(Map<String, dynamic> json) =>
       _$$FeedImplFromJson(json);
 
   @override
+  final int? id;
+  @override
   final String caption;
   @override
   final String image;
+  @override
+  final int? user_id;
+  @override
+  final String? created_at;
 
   @override
   String toString() {
-    return 'Feed(caption: $caption, image: $image)';
+    return 'Feed(id: $id, caption: $caption, image: $image, user_id: $user_id, created_at: $created_at)';
   }
 
   @override
@@ -124,13 +178,18 @@ class _$FeedImpl implements _Feed {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$FeedImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.caption, caption) || other.caption == caption) &&
-            (identical(other.image, image) || other.image == image));
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.user_id, user_id) || other.user_id == user_id) &&
+            (identical(other.created_at, created_at) ||
+                other.created_at == created_at));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, caption, image);
+  int get hashCode =>
+      Object.hash(runtimeType, id, caption, image, user_id, created_at);
 
   @JsonKey(ignore: true)
   @override
@@ -148,15 +207,24 @@ class _$FeedImpl implements _Feed {
 
 abstract class _Feed implements Feed {
   const factory _Feed(
-      {required final String caption,
-      required final String image}) = _$FeedImpl;
+      {final int? id,
+      required final String caption,
+      required final String image,
+      final int? user_id,
+      final String? created_at}) = _$FeedImpl;
 
   factory _Feed.fromJson(Map<String, dynamic> json) = _$FeedImpl.fromJson;
 
   @override
+  int? get id;
+  @override
   String get caption;
   @override
   String get image;
+  @override
+  int? get user_id;
+  @override
+  String? get created_at;
   @override
   @JsonKey(ignore: true)
   _$$FeedImplCopyWith<_$FeedImpl> get copyWith =>

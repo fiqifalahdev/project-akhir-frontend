@@ -64,7 +64,7 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
             const Duration(seconds: 5),
             () {
               Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const Layout()));
+                  MaterialPageRoute(builder: (context) => Layout(index: 0,)));
             },
           );
   }

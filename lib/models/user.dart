@@ -55,10 +55,11 @@ class User with _$User {
       {required String name,
       required String email,
       String? password,
-      String? passwordConfirmation,
+      String? password_confirmation,
       required String phone,
       required String birthdate,
-      required String gender}) = _User;
+      required String gender,
+      required String role}) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

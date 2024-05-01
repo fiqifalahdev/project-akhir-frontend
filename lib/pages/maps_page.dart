@@ -27,6 +27,60 @@ class _MapsPageState extends ConsumerState<MapsPage>
   // Nearby User data
   final List<Marker> markers = [];
 
+  // ============ Direction =================
+  bool isDirectionEnabled = false;
+  late double? latDestination;
+  late double? longDestination;
+  late List<dynamic> dummyData = [];
+
+  // Dummy directions data
+  // final List<dynamic> dummyData = [
+  //   [112.663757, -7.442767],
+  //   [112.66363, -7.442724],
+  //   [112.663117, -7.44252],
+  //   [112.662701, -7.442321],
+  //   [112.66233, -7.442125],
+  //   [112.662111, -7.441983],
+  //   [112.661951, -7.441857],
+  //   [112.661732, -7.4417],
+  //   [112.66118, -7.441425],
+  //   [112.660534, -7.441183],
+  //   [112.660447, -7.441166],
+  //   [112.660289, -7.44116],
+  //   [112.660251, -7.441158],
+  //   [112.659796, -7.441169],
+  //   [112.65926, -7.441228],
+  //   [112.65919, -7.441242],
+  //   [112.659155, -7.441269],
+  //   [112.659119, -7.441301],
+  //   [112.658605, -7.441845],
+  //   [112.658529, -7.441914],
+  //   [112.658506, -7.441937],
+  //   [112.658059, -7.442383],
+  //   [112.658013, -7.442405],
+  //   [112.657974, -7.442415],
+  //   [112.657909, -7.442413],
+  //   [112.657145, -7.442304],
+  //   [112.656951, -7.442263],
+  //   [112.656381, -7.442144],
+  //   [112.656173, -7.442061],
+  //   [112.65601, -7.442022],
+  //   [112.655598, -7.441874],
+  //   [112.65489, -7.441652],
+  //   [112.654627, -7.441553],
+  //   [112.653599, -7.441229],
+  //   [112.653428, -7.441175],
+  //   [112.652945, -7.441042],
+  //   [112.652758, -7.441727],
+  //   [112.652544, -7.442541],
+  //   [112.652421, -7.442997],
+  //   [112.652357, -7.44317],
+  //   [112.651737, -7.444783]
+  // ];
+
+  // ========================================
+
+  // ============ Map Controller ===========
   // MapController controller = MapController();
   late final AnimatedMapController controller = AnimatedMapController(
     vsync: this,
@@ -56,6 +110,23 @@ class _MapsPageState extends ConsumerState<MapsPage>
     final token = ref.watch(tokenProvider);
 
     ref.read(userLocationProvider.notifier).getUserLocation(token);
+  }
+
+  _getDirection() async {
+    final result = await ref
+        .read(directionProvider.notifier)
+        .getDirectionMapbox(latDestination!, longDestination!, lat!, long!);
+
+    setState(() {
+      dummyData =
+          ref.watch(directionProvider)['routes'][0]['geometry']['coordinates'];
+    });
+
+    // print(
+    // "Result : ${ref.watch(directionProvider)['routes'][0]['geometry']['coordinates']}");
+
+    print('dummyData : $dummyData');
+    print('isNotEmpty : ${dummyData.isNotEmpty}?');
   }
 
   @override
@@ -143,8 +214,6 @@ class _MapsPageState extends ConsumerState<MapsPage>
                                */
                             // ==============================================
 
-                            // BUG = Cannot show the markers on the map on the first render
-
                             for (var user
                                 in ref.watch(userLocationProvider)) ...[
                               Marker(
@@ -158,6 +227,15 @@ class _MapsPageState extends ConsumerState<MapsPage>
                                 child: GestureDetector(
                                   onTap: () {
                                     print("Marker tapped");
+                                    setState(() {
+                                      isDirectionEnabled = !isDirectionEnabled;
+                                      latDestination = double.parse(
+                                          user['coordinates']['latitude']);
+                                      longDestination = double.parse(
+                                          user['coordinates']['longitude']);
+
+                                      _getDirection(); // Get Direction from mapbox
+                                    });
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -177,6 +255,23 @@ class _MapsPageState extends ConsumerState<MapsPage>
                             ],
                           ],
                         ),
+                        if (isDirectionEnabled || dummyData.isNotEmpty)
+                          PolylineLayer(
+                            polylines: [
+                              Polyline(
+                                points: [
+                                  for (var data in dummyData) ...[
+                                    LatLng(data[1], data[0]),
+                                  ]
+                                  // LatLng(data[0], data[1]),
+                                  // LatLng(lat!, long!),
+                                  // LatLng(latDestination!, longDestination!),
+                                ],
+                                color: CustomColors.primary,
+                                strokeWidth: 3.0,
+                              ),
+                            ],
+                          ),
                         RichAttributionWidget(
                           attributions: [
                             TextSourceAttribution(
@@ -223,6 +318,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
                 child: IconButton(
                   onPressed: () {
                     Navigator.pop(context, 0);
+                    ref.invalidate(directionProvider);
                   },
                   icon: const Icon(
                     Icons.arrow_back_ios_new,

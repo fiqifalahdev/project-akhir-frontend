@@ -10,14 +10,15 @@ import 'dart:math' as math;
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class Layout extends ConsumerStatefulWidget {
-  const Layout({super.key});
+  int? index;
+  Layout({Key? key, this.index}) : super(key: key);
 
   @override
   ConsumerState<Layout> createState() => _LayoutState();
 }
 
 class _LayoutState extends ConsumerState<Layout> {
-  late int selectedIndex;
+  late int selectedIndex = widget.index ?? 0;
 
   final List<Widget> _page = [
     const Homepage(),

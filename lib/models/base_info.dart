@@ -7,11 +7,12 @@ part 'base_info.g.dart';
 class BaseInfo with _$BaseInfo {
   const factory BaseInfo({
     required String name,
-    required String email,
     required String phone,
     required String gender,
     required String birthdate,
-    required String role,
+    String? email,
+    String? role,
+    String? about,
     String? address,
     String? profileImage,
     String? bannerImage,

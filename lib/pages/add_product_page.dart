@@ -90,8 +90,9 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
                             }, // Nanti Pilih Gambar disini
                             child: isImagePicked || imageFile.path.isNotEmpty
                                 ? Container(
-                                    height: 200,
-                                    width: double.infinity,
+                                    height:
+                                        MediaQuery.of(context).size.width - 50,
+                                    width: MediaQuery.of(context).size.width,
                                     decoration: BoxDecoration(
                                         color: Colors.grey[100],
                                         boxShadow: const [
@@ -104,8 +105,9 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
                                             fit: BoxFit.cover)),
                                   )
                                 : Container(
-                                    height: 200,
-                                    width: double.infinity,
+                                    height:
+                                        MediaQuery.of(context).size.width - 50,
+                                    width: MediaQuery.of(context).size.width,
                                     decoration: BoxDecoration(
                                         color: Colors.grey[100],
                                         boxShadow: const [
@@ -172,8 +174,10 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
                               text: "Postingan berhasil dikirim",
                               onConfirmBtnTap: () {
                                 print("OKE");
-                                Navigator.pop(context);
-                                Navigator.pop(context);
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Layout(index: 3,)));
                               },
                             );
 
@@ -196,7 +200,6 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
                               isLoading = false;
                             });
                           });
-                          // }).catchError((error) {
                         }
                       },
                       style: ElevatedButton.styleFrom(
