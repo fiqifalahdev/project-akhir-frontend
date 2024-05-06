@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/models/base_info.dart';
@@ -202,6 +203,40 @@ class TokenProviderState extends StateNotifier<String> {
 // =================================== Base Info ===================================
 // =================================================================================
 // Define a state notifier to manage the base info process
+
+final userIdProvider =
+    StateProvider<int>((ref) => 0); // nanti set id user disini
+
+final getUserDetailProvider =
+    FutureProvider.family<Map<String, dynamic>, int>((ref, id) async {
+  print("id : $id");
+  try {
+    final token = ref.watch(tokenProvider);
+
+    final tokenEntries = {'Authorization': 'Bearer $token'};
+
+    headers.addEntries(tokenEntries.entries);
+
+    final response = await http.get(
+        Uri.parse('${MainUtil().userProfileDetails}/$id'),
+        headers: headers);
+
+    if (response.statusCode == 401) {
+      throw 'Internal Server Error : User unauthenticated';
+    }
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw 'Gagal mendapatkan data user: ${response.body}';
+    }
+
+    final json = jsonDecode(response.body)['data'];
+
+    print("Json : $json");
+    return json;
+  } catch (e) {
+    throw e.toString();
+  }
+});
 
 final getBaseInfoProvider = StateNotifierProvider<BaseInfoState, BaseInfo>(
   (ref) => BaseInfoState(ref),

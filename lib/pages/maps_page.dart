@@ -1,13 +1,18 @@
+import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/util/location.dart';
+import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:url_launcher/url_launcher.dart';
 // import 'package:loading_animation_widget/loading_animation_widget.dart';
 // import 'package:mapbox_gl/mapbox_gl.dart';
@@ -80,6 +85,8 @@ class _MapsPageState extends ConsumerState<MapsPage>
 
   // ========================================
 
+  bool isLoading = false;
+
   // ============ Map Controller ===========
   // MapController controller = MapController();
   late final AnimatedMapController controller = AnimatedMapController(
@@ -150,6 +157,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
       body: SafeArea(
         child: Stack(
           children: [
+            // Loading Widget
             Positioned(
                 top: 0,
                 left: 0,
@@ -209,7 +217,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
                                   - Map the fetched data to List<Markers> variables
                                   - Show the markers on the map
 
-                                  // Dummy Data 
+                                  // Dummy Data
                                   final data = [{userId: xx, coordinates: LatLng(lat, long)}, ... etc];
                                */
                             // ==============================================
@@ -226,16 +234,24 @@ class _MapsPageState extends ConsumerState<MapsPage>
                                         user['coordinates']['longitude'])),
                                 child: GestureDetector(
                                   onTap: () {
-                                    print("Marker tapped");
-                                    setState(() {
-                                      isDirectionEnabled = !isDirectionEnabled;
-                                      latDestination = double.parse(
-                                          user['coordinates']['latitude']);
-                                      longDestination = double.parse(
-                                          user['coordinates']['longitude']);
+                                    ref.read(userIdProvider.notifier).update(
+                                        (state) => state = user['userId']);
 
-                                      _getDirection(); // Get Direction from mapbox
-                                    });
+                                    showFlexibleBottomSheet(
+                                        context: context,
+                                        builder: _buildBottomSheet);
+
+                                    // Show the marker user profile
+
+                                    // setState(() {
+                                    //   isDirectionEnabled = !isDirectionEnabled;
+                                    //   latDestination = double.parse(
+                                    //       user['coordinates']['latitude']);
+                                    //   longDestination = double.parse(
+                                    //       user['coordinates']['longitude']);
+
+                                    //   // _getDirection(); // Get Direction from mapbox
+                                    // });
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -319,6 +335,8 @@ class _MapsPageState extends ConsumerState<MapsPage>
                   onPressed: () {
                     Navigator.pop(context, 0);
                     ref.invalidate(directionProvider);
+                    ref.invalidate(getUserDetailProvider);
+                    ref.invalidate(userLocationProvider);
                   },
                   icon: const Icon(
                     Icons.arrow_back_ios_new,
@@ -330,6 +348,252 @@ class _MapsPageState extends ConsumerState<MapsPage>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBottomSheet(
+    BuildContext context,
+    ScrollController scrollController,
+    double bottomSheetOffset,
+  ) {
+    return Consumer(builder: (context, ref, child) {
+      final details = ref.watch(userIdProvider);
+
+      final userDetail = ref.watch(getUserDetailProvider(details)).when(
+        data: (data) {
+          print("Data : $data");
+
+          final details = data['detail'];
+          final feeds = data['feeds'];
+
+          return SafeArea(
+            child: Container(
+                decoration: const BoxDecoration(
+                  color: CustomColors.putih,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: ListView(controller: scrollController, children: [
+                  // ======================== App bar ========================
+                  Container(
+                    color: CustomColors.putih,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 15),
+                    child: Column(
+                      children: [
+                        // ================= User Profile =====================
+                        Container(
+                          padding: const EdgeInsets.only(
+                              top: 18, left: 18, right: 18, bottom: 10),
+                          decoration: BoxDecoration(
+                            color: CustomColors.putih,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  offset: const Offset(2, 4),
+                                  spreadRadius: 2,
+                                  blurRadius: 10)
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                // mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                            color: CustomColors.darkBlue,
+                                            width: 5)),
+                                    child: ClipOval(
+                                      child: SizedBox.fromSize(
+                                          size: const Size.fromRadius(48),
+                                          child:
+                                              //data.profileImage == null
+                                              Image.asset(
+                                            "lib/assets/profile-avatar.jpg",
+                                            fit: BoxFit.cover,
+                                          )
+                                          // : Image.network(
+                                          //     // set the domain image
+                                          //     MainUtil().publicDomain +
+                                          //         data.profileImage!,
+                                          //     fit: BoxFit.cover,
+                                          //   )),
+                                          ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${details['name']}" ?? "Nama User",
+                                        style: const TextStyle(
+                                            fontSize: 20.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: CustomColors.darkBlue),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        "${details['role'] ?? "Peran User"} - ${details['gender'] ?? "Laki-laki"}",
+                                        style: const TextStyle(
+                                            fontSize: 14.0,
+                                            color: CustomColors.darkBlue),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              if (details['about'] != null) ...[
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                Text(
+                                  "${details['about']}",
+                                  style: TextStyle(
+                                      fontSize: 14.0,
+                                      color: CustomColors.blackOpacity),
+                                ),
+                              ],
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      "Alamat : ${details['address']}" ??
+                                          "Alamat User",
+                                      style: TextStyle(
+                                          fontSize: 14.0,
+                                          color: CustomColors.blackOpacity,
+                                          fontWeight: FontWeight.w600)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        // ================= Row Of Button ====================
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 60,
+                          color: Colors.transparent,
+                          child: Row(
+                            children: [
+                              ElevatedButton.icon(
+                                  onPressed: () {
+                                    // Ini nanti langsung directions
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: CustomColors.primary,
+                                    minimumSize: const Size(100, 40),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.alt_route_outlined,
+                                      color: CustomColors.putih),
+                                  label: const Text("Rute",
+                                      style: TextStyle(
+                                          color: CustomColors.putih,
+                                          fontWeight: FontWeight.bold))),
+                              const SizedBox(width: 10),
+                              ElevatedButton.icon(
+                                  onPressed: () {
+                                    // Ini nanti langsung chat
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: CustomColors.acceptButton,
+                                    minimumSize: const Size(100, 40),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  icon: const Icon(Icons.event,
+                                      color: CustomColors.putih),
+                                  label: const Text("Minta Bertemu",
+                                      style: TextStyle(
+                                          color: CustomColors.putih,
+                                          fontWeight: FontWeight.bold))),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: 400,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10.0, right: 10),
+                      child: GridView.builder(
+                        itemCount: feeds.length,
+                        itemBuilder: (context, index) {
+                          // Render Feed Image
+                          return InkWell(
+                            onTap: () {
+                              print("Masuk Ke detail Produk");
+                            },
+                            child: Image.network(
+                              MainUtil().publicDomain + feeds[index]['image']!,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                ])),
+          );
+        },
+        error: (error, stackTrace) {
+          print("Stacktrace : $stackTrace");
+
+          return Center(
+            child: Text("Error: $error"),
+          );
+        },
+        loading: () {
+          return loadingWidget();
+        },
+      );
+
+      return userDetail;
+    });
+  }
+
+  Widget loadingWidget() {
+    return Container(
+      // width: MediaQuery.of(context).size.width,
+      // height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        boxShadow: const [CustomColors.boxShadow],
+      ),
+      child: Center(
+        child: LoadingAnimationWidget.discreteCircle(
+            color: CustomColors.primary, size: 40.0),
       ),
     );
   }

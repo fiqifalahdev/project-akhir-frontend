@@ -193,7 +193,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               child: Container(
                   padding: const EdgeInsets.only(left: 20, top: 10, right: 20),
                   // color: Colors.amber,
-                  child: Text(data.about!))),
+                  child: Text(data.about ?? ""))),
           Positioned(
               top: 335,
               right: 10,

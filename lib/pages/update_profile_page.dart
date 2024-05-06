@@ -118,7 +118,10 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
 
                             setState(() {
                               profileImage = ref.watch(fileProvider);
+                              print("Profile Image : $profileImage");
                             });
+
+                            setState(() {});
                           },
                           icon: const Icon(
                             Icons.edit,
@@ -338,7 +341,9 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                       onConfirmBtnTap: () => Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Layout(index: 3,),
+                              builder: (context) => Layout(
+                                index: 3,
+                              ),
                             ),
                           ));
                 }).catchError((error) {

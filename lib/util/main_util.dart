@@ -22,6 +22,7 @@ class MainUtil {
 
   // Get base info
   String get baseInfo => '${_baseUrl}profiles';
+  String get userProfileDetails => '${_baseUrl}profiles'; // + /{id}p`
 
   // Update Profile data
   String get updateProfile => '${_baseUrl}profiles?_method=PUT';
