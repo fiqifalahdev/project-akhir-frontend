@@ -30,7 +30,7 @@ class _LayoutState extends ConsumerState<Layout> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    selectedIndex = 0;
+    // selectedIndex = 0;
   }
 
   @override

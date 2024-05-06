@@ -1,8 +1,4 @@
-import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/pages/add_product_page.dart';
@@ -193,7 +189,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               child: Container(
                   padding: const EdgeInsets.only(left: 20, top: 10, right: 20),
                   // color: Colors.amber,
-                  child: Text(data.about!))),
+                  child: Text(data.about ?? ""))),
           Positioned(
               top: 335,
               right: 10,
