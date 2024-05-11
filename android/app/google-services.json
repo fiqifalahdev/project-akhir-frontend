@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "29503502694",
+    "project_id": "final-project-5b6ae",
+    "storage_bucket": "final-project-5b6ae.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29503502694:android:6ca2376c0b665f507970a7",
+        "android_client_info": {
+          "package_name": "com.example.frontend_tambakku"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjhPBe4kaND5f6e_p-EbAq5wSYWSNDHD4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
