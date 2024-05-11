@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class CustomColors {
   static const Color primary = Color(0xff227BE5);
   static const Color darkBlue = Color(0xff02306A);
+  static const Color lightBlue = Color(0xff6CC3FF);
   static Color blackOpacity = Colors.black.withOpacity(0.7);
   static const Color acceptButton = Color.fromARGB(255, 22, 193, 42);
   static const Color putih = Colors.white;

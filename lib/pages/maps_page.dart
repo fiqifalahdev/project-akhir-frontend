@@ -6,14 +6,10 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
-import 'package:frontend_tambakku/util/location.dart';
 import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:frontend_tambakku/util/styles.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:quickalert/quickalert.dart';
-import 'package:url_launcher/url_launcher.dart';
 // import 'package:loading_animation_widget/loading_animation_widget.dart';
 // import 'package:mapbox_gl/mapbox_gl.dart';
 
@@ -154,8 +150,32 @@ class _MapsPageState extends ConsumerState<MapsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
+      body: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context, 0);
+              ref.invalidate(directionProvider);
+              ref.invalidate(getUserDetailProvider);
+              ref.invalidate(userLocationProvider);
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: CustomColors.putih,
+            ),
+            iconSize: 20,
+          ),
+          title: const Text(
+            "Peta",
+            style: TextStyle(
+                color: CustomColors.putih, fontWeight: FontWeight.w600),
+          ),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          backgroundColor: CustomColors.primary,
+          elevation: 0,
+        ),
+        body: Stack(
           children: [
             // Loading Widget
             Positioned(
@@ -212,11 +232,11 @@ class _MapsPageState extends ConsumerState<MapsPage>
                             /*
                                   I think from the code below is needed for showed up the marker base on the data from the API
                                   But i still doesn't know how to implement it
-
+        
                                   - Fetch User location from Location Table
                                   - Map the fetched data to List<Markers> variables
                                   - Show the markers on the map
-
+        
                                   // Dummy Data
                                   final data = [{userId: xx, coordinates: LatLng(lat, long)}, ... etc];
                                */
@@ -288,26 +308,17 @@ class _MapsPageState extends ConsumerState<MapsPage>
                               ),
                             ],
                           ),
-                        RichAttributionWidget(
-                          attributions: [
-                            TextSourceAttribution(
-                              'OpenStreetMap contributors',
-                              onTap: () => launchUrl(Uri.parse(
-                                  'https://openstreetmap.org/copyright')),
-                            ),
-                          ],
-                        ),
                       ],
                     ))),
             Positioned(
-                bottom: 70,
+                bottom: 180,
                 right: 20,
                 child: Container(
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: CustomColors.primary,
-                    borderRadius: BorderRadius.circular(8),
+                    color: CustomColors.putih,
+                    borderRadius: BorderRadius.circular(50),
                     boxShadow: const [CustomColors.boxShadow],
                   ),
                   child: IconButton(
@@ -317,33 +328,24 @@ class _MapsPageState extends ConsumerState<MapsPage>
                     },
                     icon: const Icon(
                       Icons.my_location,
-                      color: CustomColors.putih,
+                      color: CustomColors.lightBlue,
                     ),
                     iconSize: 30,
                   ),
                 )),
+            // Nearby User Carousel
             Positioned(
-              top: 20,
-              left: 20,
+              bottom: 20,
+              left: 10,
+              right: 10,
               child: Container(
                 decoration: BoxDecoration(
-                  color: CustomColors.putih,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: const [CustomColors.boxShadow],
                 ),
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context, 0);
-                    ref.invalidate(directionProvider);
-                    ref.invalidate(getUserDetailProvider);
-                    ref.invalidate(userLocationProvider);
-                  },
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new,
-                    color: CustomColors.primary,
-                  ),
-                  iconSize: 30,
-                ),
+                width: MediaQuery.of(context).size.width,
+                height: 140,
+                child: userCarousel(),
               ),
             ),
           ],
@@ -352,6 +354,52 @@ class _MapsPageState extends ConsumerState<MapsPage>
     );
   }
 
+  // ===================== Nearby User Carousel ==========================
+  Widget userCarousel() {
+    return ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: ref.watch(userLocationProvider).length,
+        itemBuilder: (context, index) {
+          // define user data
+          final user = ref.watch(userLocationProvider)[index];
+
+          return Container(
+            width: 320,
+            height: 200,
+            margin: EdgeInsets.only(
+                right: index == ref.watch(userLocationProvider).length - 1
+                    ? 0
+                    : 10),
+            decoration: BoxDecoration(
+              color: index % 2 == 0 ? CustomColors.primary : CustomColors.putih,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: const [CustomColors.boxShadow],
+            ),
+            child: Column(
+              children: [
+                Text(
+                  user['coordinates']['latitude'],
+                  style: TextStyle(
+                      color: index % 2 == 0
+                          ? CustomColors.putih
+                          : CustomColors.primary,
+                      fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  user['coordinates']['longitude'],
+                  style: TextStyle(
+                      color: index % 2 == 0
+                          ? CustomColors.putih
+                          : CustomColors.primary,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  // ================= User Details bottom Sheets ========================
   Widget _buildBottomSheet(
     BuildContext context,
     ScrollController scrollController,

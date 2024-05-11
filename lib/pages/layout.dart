@@ -3,14 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/pages/home_page.dart';
 import 'package:frontend_tambakku/pages/maps_page.dart';
+import 'package:frontend_tambakku/pages/notifications_page.dart';
 import 'package:frontend_tambakku/pages/profile_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'dart:math' as math;
 
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-
 class Layout extends ConsumerStatefulWidget {
   int? index;
+
   Layout({Key? key, this.index}) : super(key: key);
 
   @override
@@ -128,7 +128,10 @@ class _LayoutState extends ConsumerState<Layout> {
               Transform.rotate(
                 angle: 17 * math.pi / 180,
                 child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      print("OKE");
+                      Navigator.pushNamed(context, '/notification');
+                    },
                     icon: const Icon(
                       Icons.notifications_none_outlined,
                       size: 40,
