@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class CustomColors {
   static const Color primary = Color(0xff227BE5);
@@ -17,4 +18,17 @@ class CustomColors {
       offset: Offset(2, 4),
       spreadRadius: 4,
       blurRadius: 15);
+
+  static ButtonStyle outlinedButtonStyle = ButtonStyle(
+    backgroundColor: MaterialStateProperty.all<Color?>(Colors.white),
+    foregroundColor: MaterialStateProperty.all<Color?>(Colors.white),
+    overlayColor: MaterialStateProperty.all<Color?>(
+        CustomColors.lightBlue.withOpacity(0.2)),
+    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(50),
+        side: const BorderSide(color: CustomColors.primary),
+      ),
+    ),
+  );
 }

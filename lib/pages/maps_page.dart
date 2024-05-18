@@ -1,15 +1,14 @@
 import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
-import 'package:frontend_tambakku/util/main_util.dart';
+import 'package:frontend_tambakku/pages/components/loading_widget.dart';
+import 'package:frontend_tambakku/pages/components/user_details_bottomsheets.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 // import 'package:loading_animation_widget/loading_animation_widget.dart';
 // import 'package:mapbox_gl/mapbox_gl.dart';
 
@@ -252,39 +251,17 @@ class _MapsPageState extends ConsumerState<MapsPage>
                                         user['coordinates']['latitude']),
                                     double.parse(
                                         user['coordinates']['longitude'])),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    ref.read(userIdProvider.notifier).update(
-                                        (state) => state = user['userId']);
-
-                                    showFlexibleBottomSheet(
-                                        context: context,
-                                        builder: _buildBottomSheet);
-
-                                    // Show the marker user profile
-
-                                    // setState(() {
-                                    //   isDirectionEnabled = !isDirectionEnabled;
-                                    //   latDestination = double.parse(
-                                    //       user['coordinates']['latitude']);
-                                    //   longDestination = double.parse(
-                                    //       user['coordinates']['longitude']);
-
-                                    //   // _getDirection(); // Get Direction from mapbox
-                                    // });
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(50),
-                                        boxShadow: const [
-                                          CustomColors.boxShadow
-                                        ]),
-                                    child: const Icon(
-                                      Icons.account_circle_rounded,
-                                      color: CustomColors.primary,
-                                      size: 30.0,
-                                    ),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(50),
+                                      boxShadow: const [
+                                        CustomColors.boxShadow
+                                      ]),
+                                  child: const Icon(
+                                    Icons.account_circle_rounded,
+                                    color: CustomColors.primary,
+                                    size: 30.0,
                                   ),
                                 ),
                               ),
@@ -355,7 +332,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
   }
 
   // ===================== Nearby User Carousel ==========================
-  Widget userCarousel() {
+  Widget? userCarousel() {
     return ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: ref.watch(userLocationProvider).length,
@@ -363,285 +340,115 @@ class _MapsPageState extends ConsumerState<MapsPage>
           // define user data
           final user = ref.watch(userLocationProvider)[index];
 
-          return Container(
-            width: 320,
-            height: 200,
-            margin: EdgeInsets.only(
-                right: index == ref.watch(userLocationProvider).length - 1
-                    ? 0
-                    : 10),
-            decoration: BoxDecoration(
-              color: index % 2 == 0 ? CustomColors.primary : CustomColors.putih,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: const [CustomColors.boxShadow],
-            ),
-            child: Column(
-              children: [
-                Text(
-                  user['coordinates']['latitude'],
-                  style: TextStyle(
-                      color: index % 2 == 0
-                          ? CustomColors.putih
-                          : CustomColors.primary,
-                      fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  user['coordinates']['longitude'],
-                  style: TextStyle(
-                      color: index % 2 == 0
-                          ? CustomColors.putih
-                          : CustomColors.primary,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          );
+          Widget details = ref
+              .watch(getUserDetailProvider(user['userId']))
+              .when(
+                  data: (data) {
+                    final lat = double.parse(user['coordinates']['latitude']);
+
+                    final long = double.parse(user['coordinates']['longitude']);
+
+                    return GestureDetector(
+                      onTap: () {
+                        controller.mapController.move(LatLng(lat, long), 15.0);
+
+                        ref
+                            .read(userIdProvider.notifier)
+                            .update((state) => state = user['userId']);
+
+                        showFlexibleBottomSheet(
+                          context: context,
+                          builder:
+                              (context, scrollController, bottomSheetOffset) =>
+                                  UserDetailBottomSheet(
+                            scrollController: scrollController,
+                            bottomSheetOffset: bottomSheetOffset,
+                          ),
+                        );
+                      },
+                      child: userDetails(data['detail']),
+                    );
+                  },
+                  error: (error, stackTrace) => Text("Error : $error"),
+                  loading: () => Container(
+                      width: 320,
+                      height: 200,
+                      margin: EdgeInsets.only(
+                          right: index ==
+                                  ref.watch(userLocationProvider).length - 1
+                              ? 0
+                              : 10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: const [CustomColors.boxShadow],
+                      ),
+                      child: loadingWidget()));
+
+          return details;
         });
   }
 
-  // ================= User Details bottom Sheets ========================
-  Widget _buildBottomSheet(
-    BuildContext context,
-    ScrollController scrollController,
-    double bottomSheetOffset,
-  ) {
-    return Consumer(builder: (context, ref, child) {
-      final details = ref.watch(userIdProvider);
-
-      final userDetail = ref.watch(getUserDetailProvider(details)).when(
-        data: (data) {
-          print("Data : $data");
-
-          final details = data['detail'];
-          final feeds = data['feeds'];
-
-          return SafeArea(
-            child: Container(
-                decoration: const BoxDecoration(
-                  color: CustomColors.putih,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                ),
-                child: ListView(controller: scrollController, children: [
-                  // ======================== App bar ========================
-                  Container(
-                    color: CustomColors.putih,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 15),
-                    child: Column(
-                      children: [
-                        // ================= User Profile =====================
-                        Container(
-                          padding: const EdgeInsets.only(
-                              top: 18, left: 18, right: 18, bottom: 10),
-                          decoration: BoxDecoration(
-                            color: CustomColors.putih,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  offset: const Offset(2, 4),
-                                  spreadRadius: 2,
-                                  blurRadius: 10)
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                // mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                            color: CustomColors.darkBlue,
-                                            width: 5)),
-                                    child: ClipOval(
-                                      child: SizedBox.fromSize(
-                                          size: const Size.fromRadius(48),
-                                          child:
-                                              //data.profileImage == null
-                                              Image.asset(
-                                            "lib/assets/profile-avatar.jpg",
-                                            fit: BoxFit.cover,
-                                          )
-                                          // : Image.network(
-                                          //     // set the domain image
-                                          //     MainUtil().publicDomain +
-                                          //         data.profileImage!,
-                                          //     fit: BoxFit.cover,
-                                          //   )),
-                                          ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "${details['name']}" ?? "Nama User",
-                                        style: const TextStyle(
-                                            fontSize: 20.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: CustomColors.darkBlue),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        "${details['role'] ?? "Peran User"} - ${details['gender'] ?? "Laki-laki"}",
-                                        style: const TextStyle(
-                                            fontSize: 14.0,
-                                            color: CustomColors.darkBlue),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              if (details['about'] != null) ...[
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                Text(
-                                  "${details['about']}",
-                                  style: TextStyle(
-                                      fontSize: 14.0,
-                                      color: CustomColors.blackOpacity),
-                                ),
-                              ],
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                      "Alamat : ${details['address']}" ??
-                                          "Alamat User",
-                                      style: TextStyle(
-                                          fontSize: 14.0,
-                                          color: CustomColors.blackOpacity,
-                                          fontWeight: FontWeight.w600)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        // ================= Row Of Button ====================
-                        Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 60,
-                          color: Colors.transparent,
-                          child: Row(
-                            children: [
-                              ElevatedButton.icon(
-                                  onPressed: () {
-                                    // Ini nanti langsung directions
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: CustomColors.primary,
-                                    minimumSize: const Size(100, 40),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  icon: const Icon(Icons.alt_route_outlined,
-                                      color: CustomColors.putih),
-                                  label: const Text("Rute",
-                                      style: TextStyle(
-                                          color: CustomColors.putih,
-                                          fontWeight: FontWeight.bold))),
-                              const SizedBox(width: 10),
-                              ElevatedButton.icon(
-                                  onPressed: () {
-                                    // Ini nanti langsung chat
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: CustomColors.acceptButton,
-                                    minimumSize: const Size(100, 40),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  icon: const Icon(Icons.event,
-                                      color: CustomColors.putih),
-                                  label: const Text("Minta Bertemu",
-                                      style: TextStyle(
-                                          color: CustomColors.putih,
-                                          fontWeight: FontWeight.bold))),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 400,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10.0, right: 10),
-                      child: GridView.builder(
-                        itemCount: feeds.length,
-                        itemBuilder: (context, index) {
-                          // Render Feed Image
-                          return InkWell(
-                            onTap: () {
-                              print("Masuk Ke detail Produk");
-                            },
-                            child: Image.network(
-                              MainUtil().publicDomain + feeds[index]['image']!,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        },
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 1,
-                        ),
-                      ),
-                    ),
-                  ),
-                ])),
-          );
-        },
-        error: (error, stackTrace) {
-          print("Stacktrace : $stackTrace");
-
-          return Center(
-            child: Text("Error: $error"),
-          );
-        },
-        loading: () {
-          return loadingWidget();
-        },
-      );
-
-      return userDetail;
-    });
-  }
-
-  Widget loadingWidget() {
+  // ================= User Details ========================
+  Widget userDetails(final details) {
     return Container(
-      // width: MediaQuery.of(context).size.width,
-      // height: MediaQuery.of(context).size.height,
+      padding: const EdgeInsets.only(top: 18, left: 18, right: 18, bottom: 10),
+      margin: const EdgeInsets.only(right: 10),
+      height: 200,
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
-        boxShadow: const [CustomColors.boxShadow],
+        color: CustomColors.putih,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              offset: const Offset(2, 4),
+              spreadRadius: 2,
+              blurRadius: 10)
+        ],
       ),
-      child: Center(
-        child: LoadingAnimationWidget.discreteCircle(
-            color: CustomColors.primary, size: 40.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            // mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${details['name'] ?? "Nama User"}",
+                    style: const TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: CustomColors.darkBlue),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "${details['role'] ?? "Peran User"} - ${details['gender'] ?? "Laki-laki"}",
+                    style: const TextStyle(
+                        fontSize: 14.0, color: CustomColors.darkBlue),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text("Alamat : ${details['address'] ?? "Alamat User"}",
+                  style: TextStyle(
+                      fontSize: 14.0,
+                      color: CustomColors.blackOpacity,
+                      fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ],
       ),
     );
   }

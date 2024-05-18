@@ -2,15 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend_tambakku/models/appointmentrequest.dart';
 import 'package:frontend_tambakku/models/base_info.dart';
 import 'package:frontend_tambakku/models/feeds.dart';
 import 'package:frontend_tambakku/models/user.dart';
 import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // =================================================================================
@@ -627,5 +628,73 @@ class Feeds extends StateNotifier<List<Feed>> {
     }).toList();
 
     state = feeds; // Perbaiki baris ini
+  }
+}
+
+// =================================================================================
+// =============================== Appointment Provider ============================
+// =================================================================================
+
+// Set selected Date Provider
+final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
+
+final selectedTimeProvider = StateProvider<String>((ref) => '');
+
+final sendAppointmentProvider =
+    StateNotifierProvider<AppointmentProvider, AppointmentRequest>(
+        (ref) => AppointmentProvider(ref));
+
+class AppointmentProvider extends StateNotifier<AppointmentRequest> {
+  final Ref ref;
+
+  AppointmentProvider(this.ref)
+      : super(AppointmentRequest(
+            appointment_date: DateTime.now(),
+            appointment_time: '',
+            requester_id: 0,
+            recipient_id: 0,
+            status: ''));
+
+  Future<String> sendAppointment() async {
+    try {
+      final token = ref.watch(tokenProvider);
+
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        "Authorization": "Bearer $token"
+      };
+
+      final formattedDate =
+          DateFormat('yyyy-MM-dd').format(ref.watch(selectedDateProvider));
+
+      Map<String, dynamic> body = {
+        'appointment_date': formattedDate.toString(),
+        'appointment_time': ref.watch(selectedTimeProvider),
+        'recipient_id': ref.watch(userIdProvider),
+        'status': "pending",
+      };
+
+      final response = await http.post(Uri.parse(MainUtil().postAppointment),
+          headers: headers, body: jsonEncode(body));
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final responseMsg = jsonDecode(response.body);
+
+        throw "Gagal Mengirimkan Permintaan Janji Temu : ${responseMsg["message"]}";
+      }
+
+      if (response.statusCode == 401) {
+        throw "Internal Server Error : User unauthenticated";
+      }
+
+      final json = jsonDecode(response.body);
+
+      state = AppointmentRequest.fromJson(json['data']);
+
+      return 'Berhasil Mengirimkan Permintaan Janji Temu';
+    } catch (e) {
+      throw e.toString();
+    }
   }
 }

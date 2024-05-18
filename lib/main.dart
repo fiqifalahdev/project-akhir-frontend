@@ -7,6 +7,7 @@ import 'package:frontend_tambakku/firebase_options.dart';
 import 'package:frontend_tambakku/pages/layout.dart';
 import 'package:frontend_tambakku/pages/notifications_page.dart';
 import 'package:frontend_tambakku/util/firebase_api.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -17,7 +18,9 @@ void main() async {
   FirebaseApi().initFirebase();
 
   await dotenv.load(fileName: 'lib/assets/config/.env');
-  runApp(const ProviderScope(child: MyApp()));
+
+  await initializeDateFormatting('id_ID', null)
+      .then((_) => runApp(const ProviderScope(child: MyApp())));
 }
 
 class MyApp extends StatefulWidget {

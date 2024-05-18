@@ -1,9 +1,9 @@
 class MainUtil {
-  // final String _baseUrl = 'http://10.0.2.2:8000/api/';
-  final String _baseUrl = 'http://192.168.1.226:8000/api/';
+  final String _baseUrl = 'http://10.0.2.2:8000/api/';
+  // final String _baseUrl = 'http://192.168.1.226:8000/api/';
 
-  // final String _publicDomain = 'http://10.0.2.2:8000/storage/';
-  final String _publicDomain = 'http://192.168.1.226:8000/storage/';
+  final String _publicDomain = 'http://10.0.2.2:8000/storage/';
+  // final String _publicDomain = 'http://192.168.1.226:8000/storage/';
 
   // Get public domain
   String get publicDomain => _publicDomain;
@@ -33,4 +33,7 @@ class MainUtil {
 
   // Store Products
   String get postFeeds => '${_baseUrl}store/feeds';
+
+  // Store Appointment
+  String get postAppointment => '${_baseUrl}store/appointment-request';
 }
