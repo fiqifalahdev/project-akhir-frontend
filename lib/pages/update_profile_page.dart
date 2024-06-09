@@ -46,15 +46,19 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
-        elevation: 1,
-        leadingWidth: 50,
-        backgroundColor: Colors.white,
-        shadowColor: Colors.grey[50],
+        backgroundColor: CustomColors.darkBlue,
+        title: const Text(
+          "Ubah Profil",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: CustomColors.putih,
+          ),
+        ),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back_ios_new),
-          iconSize: 30,
-          color: CustomColors.darkBlue,
+          color: CustomColors.putih,
         ),
       ),
       body: SingleChildScrollView(

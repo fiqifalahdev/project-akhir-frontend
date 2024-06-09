@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:frontend_tambakku/models/appointmentrequest.dart';
 import 'package:frontend_tambakku/models/base_info.dart';
 import 'package:frontend_tambakku/models/feeds.dart';
@@ -243,6 +244,10 @@ final getBaseInfoProvider = StateNotifierProvider<BaseInfoState, BaseInfo>(
   (ref) => BaseInfoState(ref),
 );
 
+final latestAppointment = StateProvider<Map<String, dynamic>>((ref) => {});
+
+final appointmentSumProvider = StateProvider<int>((ref) => 0);
+
 class BaseInfoState extends StateNotifier<BaseInfo> {
   final Ref ref;
 
@@ -271,6 +276,8 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
 
       final json = jsonDecode(response.body)['data']['detail'];
       final feeds = jsonDecode(response.body)['data']['feeds'];
+      ref.read(appointmentSumProvider.notifier).state =
+          jsonDecode(response.body)['data']['appointmentSum'];
 
       print("feeds dari baseInfoProvider : $feeds");
       print("json baseInfo : $json");
@@ -279,15 +286,21 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
           .read(feedProvider.notifier)
           .getFeeds(feeds); // gabisa ngeread provider
 
+      ref.read(latestAppointment.notifier).state =
+          jsonDecode(response.body)['data']['latestAppointment'];
+
+      
+
       state = state.copyWith(
-          name: json['name'],
-          phone: json['phone'],
-          gender: json['gender'],
-          birthdate: json['birthdate'],
-          role: json['role'],
-          about: json['about'],
-          profileImage: json['profile_image'],
-          address: json['address']);
+        name: json['name'],
+        phone: json['phone'],
+        gender: json['gender'],
+        birthdate: json['birthdate'],
+        role: json['role'],
+        about: json['about'],
+        profileImage: json['profile_image'],
+        address: json['address'],
+      );
 
       print(state);
     } catch (error, stackTrace) {
@@ -640,6 +653,109 @@ final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
 final selectedTimeProvider = StateProvider<String>((ref) => '');
 
+final appointments = StateProvider<List<dynamic>>((ref) {
+  return [];
+});
+
+final incomingRequestProvider =
+    StateNotifierProvider<IncomingRequest, List<dynamic>>((ref) {
+  return IncomingRequest(ref);
+});
+
+class IncomingRequest extends StateNotifier<List<dynamic>> {
+  final Ref ref;
+
+  IncomingRequest(this.ref) : super([]);
+
+  Future<String> getIncomingRequest() async {
+    try {
+      final token = ref.watch(tokenProvider);
+
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        "Authorization": "Bearer $token"
+      };
+
+      final response = await http.get(Uri.parse(MainUtil().getIncomingRequest),
+          headers: headers);
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final responseMsg = jsonDecode(response.body);
+
+        throw "Gagal Mengirimkan Permintaan Janji Temu : ${responseMsg["message"]}";
+      }
+
+      if (response.statusCode == 401) {
+        throw "Internal Server Error : User unauthenticated";
+      }
+
+      final json = jsonDecode(response.body)['data']['appointments'];
+
+      print(json);
+
+      state = json;
+
+      return 'Berhasil Mengambil Data Permintaan Masuk';
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  Future<String> updateAppointment(Map<String, dynamic> params) async {
+    try {
+      final token = ref.watch(tokenProvider);
+
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        "Authorization": "Bearer $token"
+      };
+
+      final body = {};
+
+      if (params['status'] == 1) {
+        body.addAll({
+          'status': 1,
+        });
+      } else {
+        body.addAll({
+          'status': 0,
+        });
+      }
+
+      final response = await http.post(
+          Uri.parse(
+              '${MainUtil().updateAppointment}/${params["appointment_id"]}'),
+          headers: headers,
+          body: jsonEncode(body));
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final responseMsg = jsonDecode(response.body);
+
+        throw "Gagal Mengupdate Janji Temu : ${responseMsg["message"]}";
+      }
+
+      if (response.statusCode == 401) {
+        throw "Internal Server Error : User unauthenticated";
+      }
+
+      final json = jsonDecode(response.body);
+
+      state = state
+          .where((element) =>
+              element['appointment_id'] != params['appointment_id'])
+          .toList();
+
+      ref.read(appointmentSumProvider.notifier).state -= 1;
+
+      return 'Berhasil ${params['status'] == 1 ? 'Menerima' : 'Menolak'} Janji Temu';
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+}
+
 final sendAppointmentProvider =
     StateNotifierProvider<AppointmentProvider, AppointmentRequest>(
         (ref) => AppointmentProvider(ref));
@@ -654,6 +770,42 @@ class AppointmentProvider extends StateNotifier<AppointmentRequest> {
             requester_id: 0,
             recipient_id: 0,
             status: ''));
+
+  Future<String> getAppointment() async {
+    try {
+      final token = ref.watch(tokenProvider);
+
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        "Authorization": "Bearer $token"
+      };
+
+      final response = await http.get(
+          Uri.parse(MainUtil().getAppointmentByAuthUser),
+          headers: headers);
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final responseMsg = jsonDecode(response.body);
+
+        throw "Gagal Mengambil Data Janji Temu : ${responseMsg["message"]}";
+      }
+
+      if (response.statusCode == 401) {
+        throw "Internal Server Error : User unauthenticated";
+      }
+
+      final json = jsonDecode(response.body)['data'];
+
+      print(json);
+
+      ref.read(appointments.notifier).state = json;
+
+      return 'Berhasil Mengambil Data Janji Temu';
+    } catch (e) {
+      throw e.toString();
+    }
+  }
 
   Future<String> sendAppointment() async {
     try {
@@ -674,6 +826,8 @@ class AppointmentProvider extends StateNotifier<AppointmentRequest> {
         'recipient_id': ref.watch(userIdProvider),
         'status': "pending",
       };
+
+      print(body);
 
       final response = await http.post(Uri.parse(MainUtil().postAppointment),
           headers: headers, body: jsonEncode(body));

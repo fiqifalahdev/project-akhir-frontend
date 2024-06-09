@@ -13,6 +13,16 @@ class CustomColors {
   static const Color kuningMustard = Color(0xffFFB025);
   static const Color teksAbu = Color(0xff94A2AB);
 
+  // Pastel Colors
+  static const Color pastelBlu = Color(0xff7BD3EA);
+  static const Color pastelLightBlu = Color(0xffB9F3FC);
+  static const Color pastelMediumLightBlu = Color(0xffAEE2FF);
+  static const Color pastelGreyBlu = Color(0xff93C6E7);
+  static const Color pastelGreen = Color(0xffA1EEBD);
+  static const Color pastelYellow = Color(0xffF6F7C4);
+  static const Color pastelPink = Color(0xffF6D6D6);
+  static const Color pastelLightPink = Color(0xffF6D6D6);
+
   static const BoxShadow boxShadow = BoxShadow(
       color: Color.fromARGB(25, 0, 0, 0),
       offset: Offset(2, 4),

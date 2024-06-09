@@ -5,8 +5,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
-import 'package:frontend_tambakku/pages/components/loading_widget.dart';
-import 'package:frontend_tambakku/pages/components/user_details_bottomsheets.dart';
+import 'package:frontend_tambakku/components/loading_widget.dart';
+import 'package:frontend_tambakku/components/user_details_bottomsheets.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'package:latlong2/latlong.dart';
 // import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -149,86 +149,82 @@ class _MapsPageState extends ConsumerState<MapsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context, 0);
-              ref.invalidate(directionProvider);
-              ref.invalidate(getUserDetailProvider);
-              ref.invalidate(userLocationProvider);
-            },
-            icon: const Icon(
-              Icons.arrow_back_ios_new,
-              color: CustomColors.putih,
-            ),
-            iconSize: 20,
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context, 0);
+            ref.invalidate(directionProvider);
+            ref.invalidate(getUserDetailProvider);
+            ref.invalidate(userLocationProvider);
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: CustomColors.putih,
           ),
-          title: const Text(
-            "Peta",
-            style: TextStyle(
-                color: CustomColors.putih, fontWeight: FontWeight.w600),
-          ),
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-          backgroundColor: CustomColors.primary,
-          elevation: 0,
+          iconSize: 20,
         ),
-        body: Stack(
-          children: [
-            // Loading Widget
-            Positioned(
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                child: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    child: FlutterMap(
-                      mapController: controller.mapController,
-                      options: MapOptions(
-                        initialCenter: LatLng(lat!, long!),
-                        initialZoom: 15.0,
+        title: const Text(
+          "Peta",
+          style:
+              TextStyle(color: CustomColors.putih, fontWeight: FontWeight.w600),
+        ),
+        automaticallyImplyLeading: false,
+        backgroundColor: CustomColors.darkBlue,
+        elevation: 0,
+      ),
+      body: Stack(
+        children: [
+          // Loading Widget
+          Positioned(
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: FlutterMap(
+                    mapController: controller.mapController,
+                    options: MapOptions(
+                      initialCenter: LatLng(lat!, long!),
+                      initialZoom: 15.0,
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            'https://api.mapbox.com/styles/v1/fiqifalah/cluxu0d1o003i01qzhjvd6dxs/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZmlxaWZhbGFoIiwiYSI6ImNsdTJ5em8wczB0bjgya252dnI4dWl3eHIifQ.TMchcRAVp_OJt1UaFPxDvg',
+                        userAgentPackageName: 'com.example.app',
+                        additionalOptions: {
+                          'accessToken': token!,
+                          'id': 'mapbox.mapbox-streets-v8',
+                        },
                       ),
-                      children: [
-                        TileLayer(
-                          urlTemplate:
-                              'https://api.mapbox.com/styles/v1/fiqifalah/cluxu0d1o003i01qzhjvd6dxs/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZmlxaWZhbGFoIiwiYSI6ImNsdTJ5em8wczB0bjgya252dnI4dWl3eHIifQ.TMchcRAVp_OJt1UaFPxDvg',
-                          userAgentPackageName: 'com.example.app',
-                          additionalOptions: {
-                            'accessToken': token!,
-                            'id': 'mapbox.mapbox-streets-v8',
-                          },
-                        ),
-                        MarkerLayer(
-                          markers: [
-                            // Set user marker on map using layer itself
-                            Marker(
-                              width: 35.0,
-                              height: 35.0,
-                              point: LatLng(lat!, long!),
-                              child: GestureDetector(
-                                onTap: () {
-                                  print("Marker tapped");
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(50),
-                                      boxShadow: const [
-                                        CustomColors.boxShadow
-                                      ]),
-                                  child: const Icon(
-                                    Icons.circle,
-                                    color: CustomColors.primary,
-                                    size: 30.0,
-                                  ),
+                      MarkerLayer(
+                        markers: [
+                          // Set user marker on map using layer itself
+                          Marker(
+                            width: 35.0,
+                            height: 35.0,
+                            point: LatLng(lat!, long!),
+                            child: GestureDetector(
+                              onTap: () {
+                                print("Marker tapped");
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(50),
+                                    boxShadow: const [CustomColors.boxShadow]),
+                                child: const Icon(
+                                  Icons.circle,
+                                  color: CustomColors.primary,
+                                  size: 30.0,
                                 ),
                               ),
                             ),
-                            // ==============================================
-                            /*
+                          ),
+                          // ==============================================
+                          /*
                                   I think from the code below is needed for showed up the marker base on the data from the API
                                   But i still doesn't know how to implement it
         
@@ -239,94 +235,89 @@ class _MapsPageState extends ConsumerState<MapsPage>
                                   // Dummy Data
                                   final data = [{userId: xx, coordinates: LatLng(lat, long)}, ... etc];
                                */
-                            // ==============================================
+                          // ==============================================
 
-                            for (var user
-                                in ref.watch(userLocationProvider)) ...[
-                              Marker(
-                                width: 35.0,
-                                height: 35.0,
-                                point: LatLng(
-                                    double.parse(
-                                        user['coordinates']['latitude']),
-                                    double.parse(
-                                        user['coordinates']['longitude'])),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(50),
-                                      boxShadow: const [
-                                        CustomColors.boxShadow
-                                      ]),
-                                  child: const Icon(
-                                    Icons.account_circle_rounded,
-                                    color: CustomColors.primary,
-                                    size: 30.0,
-                                  ),
+                          for (var user in ref.watch(userLocationProvider)) ...[
+                            Marker(
+                              width: 35.0,
+                              height: 35.0,
+                              point: LatLng(
+                                  double.parse(user['coordinates']['latitude']),
+                                  double.parse(
+                                      user['coordinates']['longitude'])),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(50),
+                                    boxShadow: const [CustomColors.boxShadow]),
+                                child: const Icon(
+                                  Icons.account_circle_rounded,
+                                  color: CustomColors.primary,
+                                  size: 30.0,
                                 ),
                               ),
-                            ],
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (isDirectionEnabled || dummyData.isNotEmpty)
+                        PolylineLayer(
+                          polylines: [
+                            Polyline(
+                              points: [
+                                for (var data in dummyData) ...[
+                                  LatLng(data[1], data[0]),
+                                ]
+                                // LatLng(data[0], data[1]),
+                                // LatLng(lat!, long!),
+                                // LatLng(latDestination!, longDestination!),
+                              ],
+                              color: CustomColors.primary,
+                              strokeWidth: 3.0,
+                            ),
                           ],
                         ),
-                        if (isDirectionEnabled || dummyData.isNotEmpty)
-                          PolylineLayer(
-                            polylines: [
-                              Polyline(
-                                points: [
-                                  for (var data in dummyData) ...[
-                                    LatLng(data[1], data[0]),
-                                  ]
-                                  // LatLng(data[0], data[1]),
-                                  // LatLng(lat!, long!),
-                                  // LatLng(latDestination!, longDestination!),
-                                ],
-                                color: CustomColors.primary,
-                                strokeWidth: 3.0,
-                              ),
-                            ],
-                          ),
-                      ],
-                    ))),
-            Positioned(
-                bottom: 180,
-                right: 20,
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: CustomColors.putih,
-                    borderRadius: BorderRadius.circular(50),
-                    boxShadow: const [CustomColors.boxShadow],
-                  ),
-                  child: IconButton(
-                    onPressed: () {
-                      // controller.(LatLng(lat, long), 17.0);
-                      controller.mapController.move(LatLng(lat!, long!), 15.0);
-                    },
-                    icon: const Icon(
-                      Icons.my_location,
-                      color: CustomColors.lightBlue,
-                    ),
-                    iconSize: 30,
-                  ),
-                )),
-            // Nearby User Carousel
-            Positioned(
-              bottom: 20,
-              left: 10,
-              right: 10,
+                    ],
+                  ))),
+          Positioned(
+              bottom: 180,
+              right: 20,
               child: Container(
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  color: CustomColors.putih,
+                  borderRadius: BorderRadius.circular(50),
                   boxShadow: const [CustomColors.boxShadow],
                 ),
-                width: MediaQuery.of(context).size.width,
-                height: 140,
-                child: userCarousel(),
+                child: IconButton(
+                  onPressed: () {
+                    // controller.(LatLng(lat, long), 17.0);
+                    controller.mapController.move(LatLng(lat!, long!), 15.0);
+                  },
+                  icon: const Icon(
+                    Icons.my_location,
+                    color: CustomColors.lightBlue,
+                  ),
+                  iconSize: 30,
+                ),
+              )),
+          // Nearby User Carousel
+          Positioned(
+            bottom: 20,
+            left: 10,
+            right: 10,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: const [CustomColors.boxShadow],
               ),
+              width: MediaQuery.of(context).size.width,
+              height: 140,
+              child: userCarousel(),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

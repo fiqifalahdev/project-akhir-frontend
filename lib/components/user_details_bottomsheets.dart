@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
-import 'package:frontend_tambakku/pages/components/custom_date_timeline_picker.dart';
-import 'package:frontend_tambakku/pages/components/loading_widget.dart';
-import 'package:frontend_tambakku/pages/components/time_option_button.dart';
+import 'package:frontend_tambakku/components/custom_date_timeline_picker.dart';
+import 'package:frontend_tambakku/components/loading_widget.dart';
+import 'package:frontend_tambakku/components/time_option_button.dart';
 import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
