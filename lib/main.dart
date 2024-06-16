@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/pages/appointment_request_page.dart';
+import 'package:frontend_tambakku/pages/fish_price.dart';
 import 'package:frontend_tambakku/pages/incoming_request_page.dart';
 import 'package:frontend_tambakku/pages/introduction_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,22 +19,27 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  FirebaseApi().initFirebase();
-
   await dotenv.load(fileName: 'lib/assets/config/.env');
 
   await initializeDateFormatting('id_ID', null)
       .then((_) => runApp(const ProviderScope(child: MyApp())));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseApi().initFirebase(ref);
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -55,6 +61,9 @@ class _MyAppState extends State<MyApp> {
         '/my-appointment': (context) =>
             const AppointmentPage(), // AppointmentPage
         '/incoming-request': (context) => const IncomingRequestPage(),
+        '/fish-price': (context) => Layout(
+              index: 2,
+            ),
         '/notification': (context) => const NotificationPage(),
       },
     );

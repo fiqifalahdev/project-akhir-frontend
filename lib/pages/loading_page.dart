@@ -50,18 +50,17 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
 
   Future<void> _getBaseInfo() async {
     final token = ref.watch(tokenProvider);
-
     // Cek apakah token sudah ada belum jika ada arahkan ke Homepage jika belum ke login
     token.isEmpty
         ? Future.delayed(
-            const Duration(seconds: 5),
+            const Duration(seconds: 7),
             () {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => const LoginPage()));
             },
           )
         : Future.delayed(
-            const Duration(seconds: 5),
+            const Duration(seconds: 7),
             () {
               Navigator.pushReplacement(
                   context,

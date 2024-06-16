@@ -75,7 +75,7 @@ class _HomepageState extends State<Homepage> {
                   label: "Lihat Harga Ikan",
                   color: CustomColors.pastelPink,
                   opacity: 0.3,
-                  onPressed: () => Navigator.pushNamed(context, '/')),
+                  onPressed: () => Navigator.pushNamed(context, '/fish-price')),
             ],
           ),
           const SizedBox(

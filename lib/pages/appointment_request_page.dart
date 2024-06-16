@@ -4,7 +4,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/components/badge_info.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
+import 'package:frontend_tambakku/pages/directions_maps.dart';
+import 'package:frontend_tambakku/pages/maps_page.dart';
 import 'package:frontend_tambakku/util/helpers.dart';
+import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 
 class AppointmentPage extends ConsumerStatefulWidget {
@@ -17,6 +20,14 @@ class AppointmentPage extends ConsumerStatefulWidget {
 
 class _AppointmentPageState extends ConsumerState<AppointmentPage>
     with TickerProviderStateMixin {
+  late double? lat;
+  late double? long;
+  // ============ Direction =================
+  bool isDirectionEnabled = false;
+  late double? latDestination;
+  late double? longDestination;
+  late List<dynamic> dummyData = [];
+
   // Variables
   late final TabController _tabController =
       TabController(length: 3, vsync: this);
@@ -25,11 +36,38 @@ class _AppointmentPageState extends ConsumerState<AppointmentPage>
     await ref.read(sendAppointmentProvider.notifier).getAppointment();
   }
 
+  void _getUserLonglat() async {
+    final longlat = ref.watch(locationProvider);
+
+    print("longlat : $longlat");
+
+    lat = longlat['latitude'];
+    long = longlat['longitude'];
+
+    print("lat : $lat");
+    print("long : $long");
+  }
+
+  _getDirection() async {
+    print(
+        "Result : ${ref.watch(directionProvider)['routes'][0]['geometry']['coordinates']}");
+
+    print('dummyData : $dummyData');
+    print('isNotEmpty : ${dummyData.isNotEmpty}?');
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getAppointments();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    _getUserLonglat();
   }
 
   TabBar tabBar() {
@@ -133,22 +171,19 @@ class _AppointmentPageState extends ConsumerState<AppointmentPage>
                                 border: Border.all(
                                     color: CustomColors.darkBlue, width: 5)),
                             child: ClipOval(
-                              child: SizedBox.fromSize(
-                                  size: const Size.fromRadius(48),
-                                  child:
-                                      //data.profileImage == null
-                                      Image.asset(
-                                    "lib/assets/profile-avatar.jpg",
-                                    fit: BoxFit.cover,
-                                  )
-                                  // : Image.network(
-                                  //     // set the domain image
-                                  //     MainUtil().publicDomain +
-                                  //         data.profileImage!,
-                                  //     fit: BoxFit.cover,
-                                  //   )),
-                                  ),
-                            ),
+                                child: SizedBox.fromSize(
+                                    size: const Size.fromRadius(48),
+                                    child: appointment['recipient']
+                                                ['profile_image'] ==
+                                            null
+                                        ? Image.asset(
+                                            "lib/assets/profile-avatar.jpg",
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.network(
+                                            "${MainUtil().publicDomain}${appointment['recipient']['profile_image']}",
+                                            fit: BoxFit.cover,
+                                          ))),
                           ),
                           const SizedBox(width: 20),
                           Column(
@@ -257,7 +292,48 @@ class _AppointmentPageState extends ConsumerState<AppointmentPage>
                                 )),
                           ] else if (status == "accepted") ...[
                             TextButton.icon(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  await ref
+                                      .read(locationProvider.notifier)
+                                      .getTargetLocation(
+                                          appointment['recipient']['id']);
+
+                                  setState(() {
+                                    latDestination = ref.watch(
+                                        targetLocationProvider)['latitude'];
+                                    longDestination = ref.watch(
+                                        targetLocationProvider)['longitude'];
+                                  });
+
+                                  await ref
+                                      .read(directionProvider.notifier)
+                                      .getDirectionMapbox(latDestination!,
+                                          longDestination!, lat!, long!);
+
+                                  setState(() {
+                                    dummyData =
+                                        ref.watch(directionProvider)['routes']
+                                            [0]['geometry']['coordinates'];
+                                  });
+
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              DirectionsMapsPage(
+                                                userId: appointment['recipient']
+                                                    ['id'],
+                                                lat: lat,
+                                                long: long,
+                                                latDestination: latDestination,
+                                                longDestination:
+                                                    longDestination,
+                                                address: ref.watch(
+                                                        targetLocationProvider)[
+                                                    'address'],
+                                                coordinatesGeometry: dummyData,
+                                              )));
+                                },
                                 style: ButtonStyle(
                                   foregroundColor:
                                       MaterialStateProperty.all<Color>(
@@ -288,7 +364,9 @@ class _AppointmentPageState extends ConsumerState<AppointmentPage>
                                 )),
                           ] else ...[
                             TextButton.icon(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/maps');
+                                },
                                 style: ButtonStyle(
                                   foregroundColor:
                                       MaterialStateProperty.all<Color>(

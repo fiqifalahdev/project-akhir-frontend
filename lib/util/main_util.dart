@@ -1,9 +1,9 @@
 class MainUtil {
   // final String _baseUrl = 'http://10.0.2.2:8000/api/';
-  final String _baseUrl = 'http://192.168.1.226:8000/api/';
+  final String _baseUrl = 'http://192.168.144.181:8000/api/';
 
   // final String _publicDomain = 'http://10.0.2.2:8000/storage/';
-  final String _publicDomain = 'http://192.168.1.226:8000/storage/';
+  final String _publicDomain = 'http://192.168.144.181:8000/storage/';
 
   // Get public domain
   String get publicDomain => _publicDomain;
@@ -30,6 +30,7 @@ class MainUtil {
   // Post user location
   String get postLocation => '${_baseUrl}store/location';
   String get getLocation => '${_baseUrl}locations';
+  String get getTargetLocation => '${_baseUrl}locations/target';
 
   // Store Products
   String get postFeeds => '${_baseUrl}store/feeds';
@@ -39,4 +40,7 @@ class MainUtil {
   String get getAppointmentByAuthUser => '${_baseUrl}get/appointment-request';
   String get getIncomingRequest => '${_baseUrl}get/appointment-recipient';
   String get updateAppointment => '${_baseUrl}update/appointment-request';
+
+  // Store user devices token
+  String get storeDevicesToken => '${_baseUrl}store/user-token';
 }

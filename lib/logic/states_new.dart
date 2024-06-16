@@ -177,6 +177,7 @@ class TokenProviderState extends StateNotifier<String> {
     await prefs.setString('token', token);
 
     ref.read(getBaseInfoProvider.notifier).getBaseInfo(token);
+    ref.read(storeFCMTokenProvider.notifier).storeFCMToken(token);
 
     state = token;
   }
@@ -287,9 +288,7 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
           .getFeeds(feeds); // gabisa ngeread provider
 
       ref.read(latestAppointment.notifier).state =
-          jsonDecode(response.body)['data']['latestAppointment'];
-
-      
+          jsonDecode(response.body)['data']['latestAppointment'] ?? {};
 
       state = state.copyWith(
         name: json['name'],
@@ -462,6 +461,14 @@ class AddressProvider extends StateNotifier<String> {
 // =============================== Location Provider ==============================
 // =================================================================================
 
+final targetLocationProvider = StateProvider<Map<String, dynamic>>((ref) {
+  return {
+    'latitude': 0, // default value for latitude
+    'longitude': 0, // default value for longitude
+    'address': ''
+  };
+});
+
 final locationProvider =
     StateNotifierProvider<LocationProvider, Map<String, double>>((ref) {
   return LocationProvider(ref);
@@ -485,6 +492,44 @@ class LocationProvider extends StateNotifier<Map<String, double>> {
 
     print("Latitude: $latitude, Longitude: $longitude");
     print("State : $state");
+  }
+
+  Future<void> getTargetLocation(int userId) async {
+    try {
+      final token = ref.watch(tokenProvider);
+
+      final tokenEntries = <String, String>{'Authorization': 'Bearer $token'};
+
+      headers.addEntries(tokenEntries.entries);
+
+      final body = {
+        'user_id': userId,
+      };
+
+      final response = await http.post(Uri.parse(MainUtil().getTargetLocation),
+          headers: headers, body: jsonEncode(body));
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(
+            "Gagal untuk mendapatkan lokasi target: ${response.body}");
+      }
+
+      if (response.statusCode == 401) {
+        throw Exception("Internal Server Error : User unauthenticated");
+      }
+
+      final json = jsonDecode(response.body)['data'];
+
+      print("Get target location : $json");
+
+      ref.read(targetLocationProvider.notifier).state = {
+        'latitude': double.parse(json['latitude']),
+        'longitude': double.parse(json['longitude']),
+        'address': json['address']
+      };
+    } catch (e) {
+      throw Exception('Failed to get user location: $e');
+    }
   }
 }
 
@@ -847,6 +892,60 @@ class AppointmentProvider extends StateNotifier<AppointmentRequest> {
       state = AppointmentRequest.fromJson(json['data']);
 
       return 'Berhasil Mengirimkan Permintaan Janji Temu';
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+}
+
+// =============================================================================
+// ========================== Notification Provider ============================
+// =============================================================================
+
+final fcmTokenProvider = StateProvider<String>((ref) => '');
+
+final storeFCMTokenProvider =
+    StateNotifierProvider<StoreFCMToken, String>((ref) => StoreFCMToken(ref));
+
+class StoreFCMToken extends StateNotifier<String> {
+  final Ref ref;
+
+  StoreFCMToken(this.ref) : super('');
+
+  Future<String> storeFCMToken(String authToken) async {
+    try {
+      final fcmToken = ref.watch(fcmTokenProvider);
+
+      final tokenEntries = <String, String>{
+        'Authorization': 'Bearer $authToken'
+      };
+
+      headers.addEntries(tokenEntries.entries);
+
+      final body = {
+        'device_token': fcmToken,
+      };
+
+      final response = await http.post(Uri.parse(MainUtil().storeDevicesToken),
+          headers: headers, body: jsonEncode(body));
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final responseMsg = jsonDecode(response.body);
+
+        throw "Gagal Menyimpan FCM Token : ${responseMsg["message"]}";
+      }
+
+      if (response.statusCode == 401) {
+        throw "Internal Server Error : User unauthenticated";
+      }
+
+      final json = jsonDecode(response.body);
+
+      state = json['message'];
+
+      print('Store FCM Token : $state');
+
+      return 'Berhasil Menyimpan FCM Token';
     } catch (e) {
       throw e.toString();
     }
