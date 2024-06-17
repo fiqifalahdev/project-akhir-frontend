@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
+import 'package:frontend_tambakku/pages/fish_price.dart';
 import 'package:frontend_tambakku/pages/home_page.dart';
 import 'package:frontend_tambakku/pages/maps_page.dart';
 import 'package:frontend_tambakku/pages/notifications_page.dart';
@@ -22,7 +23,7 @@ class _LayoutState extends ConsumerState<Layout> {
 
   final List<Widget> _page = [
     const Homepage(),
-    const Center(child: Text("Harga Ikan")),
+    const FishPrice(),
     const ProfilePage(),
   ];
 
@@ -48,9 +49,7 @@ class _LayoutState extends ConsumerState<Layout> {
           child: Column(
             children: [
               if (selectedIndex == 0) ...[const Homepage()],
-              if (selectedIndex == 2) ...[
-                const Center(child: Text("Harga Ikan"))
-              ],
+              if (selectedIndex == 2) ...[const FishPrice()],
               if (selectedIndex == 3) ...[const ProfilePage()]
             ],
           )),

@@ -1,6 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend_tambakku/pages/layout.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 
 class NotificationPage extends StatefulWidget {
@@ -16,9 +15,9 @@ class NotificationPageState extends State<NotificationPage> {
     // Get Arguments from routing that defined in FirebaseAPI when it get a message
     final arguments = ModalRoute.of(context)!.settings.arguments;
 
-    RemoteMessage message = arguments as RemoteMessage;
+    late RemoteMessage message = arguments as RemoteMessage;
     // Get the message from the arguments
-    print("Message: ${message.notification?.title}");
+    // print("Message: ${message.notification?.title}");
 
     return SafeArea(
         child: Scaffold(
@@ -65,4 +64,66 @@ class NotificationPageState extends State<NotificationPage> {
       ),
     ));
   }
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Material(
+  //     child: Container(
+  //       child: EasyDateTimeLine(
+  //         initialDate: DateTime.now(),
+  //         onDateChange: (selectedDate) {
+  //           //`selectedDate` the new date selected.
+  //         },
+  //         dayProps: const EasyDayProps(
+  //           height: 56.0,
+  //           // You must specify the width in this case.
+  //           width: 124.0,
+  //         ),
+  //         headerProps: const EasyHeaderProps(
+  //           dateFormatter: DateFormatter.fullDateMonthAsStrDY(),
+  //         ),
+  //         locale: 'id_ID',
+  //         itemBuilder: (BuildContext context, String dayNumber, dayName,
+  //             monthName, fullDate, isSelected) {
+  //           return Container(
+  //             //the same width that provided previously.
+  //             width: 124.0,
+  //             padding: const EdgeInsets.symmetric(horizontal: 8.0),
+  //             decoration: BoxDecoration(
+  //               color: isSelected ? CustomColors.primary : null,
+  //               borderRadius: BorderRadius.circular(16.0),
+  //             ),
+  //             child: Column(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 const SizedBox(
+  //                   width: 8.0,
+  //                 ),
+  //                 Text(
+  //                   dayNumber,
+  //                   style: TextStyle(
+  //                     fontSize: 20,
+  //                     fontWeight: FontWeight.bold,
+  //                     color:
+  //                         isSelected ? Colors.white : const Color(0xff393646),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(
+  //                   width: 8.0,
+  //                 ),
+  //                 Text(
+  //                   dayName,
+  //                   style: TextStyle(
+  //                     fontSize: 12,
+  //                     color:
+  //                         isSelected ? Colors.white : const Color(0xff6D5D6E),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           );
+  //         },
+  //       ),
+  //     ),
+  //   );
+  // }
 }

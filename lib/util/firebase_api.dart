@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend_tambakku/logic/states_new.dart';
+import 'package:http/http.dart' as http;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:frontend_tambakku/main.dart';
+import 'package:frontend_tambakku/util/main_util.dart';
 
 /// Class that used for Firebase API
 /// it contains logic and how the apps accept the Firebase API functions.
@@ -36,11 +41,12 @@ class FirebaseApi {
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
 
-  void initFirebase() async {
+  void initFirebase(WidgetRef ref) async {
     _firebaseMessaging.requestPermission();
 
     final token = await _firebaseMessaging.getToken();
-    print('FCM Token: $token');
+
+    ref.read(fcmTokenProvider.notifier).state = token!;
 
     initPushNotification();
   }

@@ -50,29 +50,37 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
 
   Future<void> _getBaseInfo() async {
     final token = ref.watch(tokenProvider);
-
     // Cek apakah token sudah ada belum jika ada arahkan ke Homepage jika belum ke login
     token.isEmpty
         ? Future.delayed(
-            const Duration(seconds: 5),
+            const Duration(seconds: 7),
             () {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => const LoginPage()));
             },
           )
         : Future.delayed(
-            const Duration(seconds: 5),
+            const Duration(seconds: 7),
             () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => Layout(index: 0,)));
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Layout(
+                            index: 0,
+                          )));
             },
           );
+  }
+
+  Future<void> _getIncomingRequest() async {
+    ref.read(incomingRequestProvider.notifier).getIncomingRequest();
   }
 
   @override
   Widget build(BuildContext context) {
     _getBaseInfo();
     _getUserLocation();
+    _getIncomingRequest();
 
     return Scaffold(
         body: Stack(children: [
