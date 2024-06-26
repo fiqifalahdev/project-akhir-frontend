@@ -139,16 +139,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 children: [
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.5,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(data.name ?? "Pengguna",
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                            )),
-                      ],
-                    ),
+                    child: Text(data.name ?? "Pengguna",
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                        )),
                   ),
                   const SizedBox(
                     height: 5,
@@ -186,7 +181,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
           ),
           Positioned(
-              top: 200,
+              top: 250,
               left: 10,
               right: 10,
               bottom: 0,
@@ -284,34 +279,37 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         TextButton.icon(
           onPressed: () {
             QuickAlert.show(
-              context: context,
-              type: QuickAlertType.confirm,
-              title: "Konfirmasi",
-              text: "Apakah Anda yakin ingin keluar?",
-              onConfirmBtnTap: () {
-                ref.read(registrationProvider.notifier).logout().then((value) {
-                  QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.success,
-                    title: "Berhasil",
-                    text: value ?? "Berhasil Keluar",
-                    onConfirmBtnTap: () {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginPage()));
-                    },
-                  );
-                }).catchError((error) {
-                  QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.error,
-                    title: "Error",
-                    text: "Terdapat Kesalahan pada Server!",
-                  );
-                });
-              },
-            );
+                context: context,
+                type: QuickAlertType.confirm,
+                title: "Konfirmasi",
+                text: "Apakah Anda yakin ingin keluar?",
+                onConfirmBtnTap: () {
+                  ref
+                      .read(registrationProvider.notifier)
+                      .logout()
+                      .then((value) {
+                    QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.success,
+                      title: "Berhasil",
+                      text: value ?? "Berhasil Keluar",
+                      onConfirmBtnTap: () {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()));
+                      },
+                    );
+                  }).catchError((error) {
+                    QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.error,
+                      title: "Error",
+                      text: "Terdapat Kesalahan pada Server!",
+                    );
+                  });
+                },
+                confirmBtnText: "Oke");
           },
           style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(Colors.red),

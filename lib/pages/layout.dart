@@ -124,19 +124,6 @@ class _LayoutState extends ConsumerState<Layout> {
                   ),
                 ],
               ),
-              Transform.rotate(
-                angle: 17 * math.pi / 180,
-                child: IconButton(
-                    onPressed: () {
-                      print("OKE");
-                      Navigator.pushNamed(context, '/notification');
-                    },
-                    icon: const Icon(
-                      Icons.notifications_none_outlined,
-                      size: 40,
-                      color: CustomColors.primary,
-                    )),
-              ),
             ],
           ),
         ));

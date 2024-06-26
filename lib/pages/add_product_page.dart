@@ -177,7 +177,9 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
                                 Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => Layout(index: 3,)));
+                                        builder: (context) => Layout(
+                                              index: 3,
+                                            )));
                               },
                             );
 
@@ -187,8 +189,8 @@ class _AddProductPageState extends ConsumerState<AddProductPage> {
 
                             captionController.clear();
                           }).onError((error, stackTrace) {
-                            // print("error: $error");
-                            // print("stackTrace: $stackTrace");
+                            print("error: $error");
+                            print("stackTrace: $stackTrace");
                             QuickAlert.show(
                               type: QuickAlertType.error,
                               context: context,

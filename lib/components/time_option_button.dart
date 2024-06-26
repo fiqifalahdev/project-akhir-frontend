@@ -16,7 +16,7 @@ class TimeOptionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 110,
+      width: 100,
       child: ElevatedButton(
         onPressed: onSelected,
         style: isSelected

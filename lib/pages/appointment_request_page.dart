@@ -221,8 +221,8 @@ class _AppointmentPageState extends ConsumerState<AppointmentPage>
                       const SizedBox(
                         height: 15,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
                         children: [
                           if (status == "pending" || status == "accepted")
                             Row(

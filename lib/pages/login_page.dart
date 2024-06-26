@@ -43,25 +43,6 @@ class _LoginPageState extends State<LoginPage> {
                         TextStyle(fontSize: 37, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 15),
                 formField(),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: const Text(
-                        "Lupa Kata Sandi?",
-                        style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black),
-                      ),
-                    )
-                  ],
-                ),
                 const SizedBox(
                   height: 20,
                 ),
