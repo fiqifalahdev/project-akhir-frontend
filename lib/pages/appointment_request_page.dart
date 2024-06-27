@@ -176,8 +176,8 @@ class _AppointmentPageState extends ConsumerState<AppointmentPage>
                                     child: appointment['recipient']
                                                 ['profile_image'] ==
                                             null
-                                        ? Image.asset(
-                                            "lib/assets/profile-avatar.jpg",
+                                        ? Image.network(
+                                            "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
                                             fit: BoxFit.cover,
                                           )
                                         : Image.network(

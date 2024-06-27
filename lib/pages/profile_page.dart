@@ -168,8 +168,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 child: SizedBox.fromSize(
                     size: const Size.fromRadius(48),
                     child: data.profileImage == null
-                        ? Image.asset(
-                            "lib/assets/profile-avatar.jpg",
+                        ? Image.network(
+                            // set the domain image
+                            "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
                             fit: BoxFit.cover,
                           )
                         : Image.network(
@@ -294,10 +295,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       title: "Berhasil",
                       text: value ?? "Berhasil Keluar",
                       onConfirmBtnTap: () {
-                        Navigator.pushReplacement(
-                            context,
+                        Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
-                                builder: (context) => const LoginPage()));
+                              builder: (context) => const LoginPage(),
+                            ),
+                            (route) => false);
                       },
                     );
                   }).catchError((error) {

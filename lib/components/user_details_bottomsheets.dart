@@ -102,10 +102,8 @@ class _UserDetailBottomSheetState extends ConsumerState<UserDetailBottomSheet> {
                                         size: const Size.fromRadius(48),
                                         child:
                                             //data.profileImage == null
-                                            Image.asset(
-                                          "lib/assets/profile-avatar.jpg",
-                                          fit: BoxFit.cover,
-                                        )
+                                            Image.network(
+                                                "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png")
                                         // : Image.network(
                                         //     // set the domain image
                                         //     MainUtil().publicDomain +
@@ -221,7 +219,7 @@ class _UserDetailBottomSheetState extends ConsumerState<UserDetailBottomSheet> {
                                         print("Ajukan Janji Temu");
                                         print(ref.watch(selectedDateProvider));
                                         print(ref.watch(selectedTimeProvider));
-  
+
                                         final res = ref
                                             .read(sendAppointmentProvider
                                                 .notifier)
