@@ -139,16 +139,11 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 children: [
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.5,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(data.name ?? "Pengguna",
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.bold,
-                            )),
-                      ],
-                    ),
+                    child: Text(data.name ?? "Pengguna",
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                        )),
                   ),
                   const SizedBox(
                     height: 5,
@@ -173,8 +168,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 child: SizedBox.fromSize(
                     size: const Size.fromRadius(48),
                     child: data.profileImage == null
-                        ? Image.asset(
-                            "lib/assets/profile-avatar.jpg",
+                        ? Image.network(
+                            // set the domain image
+                            "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
                             fit: BoxFit.cover,
                           )
                         : Image.network(
@@ -186,7 +182,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
           ),
           Positioned(
-              top: 200,
+              top: 250,
               left: 10,
               right: 10,
               bottom: 0,
@@ -284,34 +280,38 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         TextButton.icon(
           onPressed: () {
             QuickAlert.show(
-              context: context,
-              type: QuickAlertType.confirm,
-              title: "Konfirmasi",
-              text: "Apakah Anda yakin ingin keluar?",
-              onConfirmBtnTap: () {
-                ref.read(registrationProvider.notifier).logout().then((value) {
-                  QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.success,
-                    title: "Berhasil",
-                    text: value ?? "Berhasil Keluar",
-                    onConfirmBtnTap: () {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginPage()));
-                    },
-                  );
-                }).catchError((error) {
-                  QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.error,
-                    title: "Error",
-                    text: "Terdapat Kesalahan pada Server!",
-                  );
-                });
-              },
-            );
+                context: context,
+                type: QuickAlertType.confirm,
+                title: "Konfirmasi",
+                text: "Apakah Anda yakin ingin keluar?",
+                onConfirmBtnTap: () {
+                  ref
+                      .read(registrationProvider.notifier)
+                      .logout()
+                      .then((value) {
+                    QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.success,
+                      title: "Berhasil",
+                      text: value ?? "Berhasil Keluar",
+                      onConfirmBtnTap: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => const LoginPage(),
+                            ),
+                            (route) => false);
+                      },
+                    );
+                  }).catchError((error) {
+                    QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.error,
+                      title: "Error",
+                      text: "Terdapat Kesalahan pada Server!",
+                    );
+                  });
+                },
+                confirmBtnText: "Oke");
           },
           style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(Colors.red),

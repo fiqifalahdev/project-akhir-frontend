@@ -479,8 +479,8 @@ class LocationProvider extends StateNotifier<Map<String, double>> {
 
   LocationProvider(this.ref)
       : super({
-          'latitude': -7.445035578944926, // default value for latitude
-          'longitude': 112.65081468165897, // default value for longitude
+          'latitude': -7.4627977511063825, // default value for latitude
+          'longitude': 112.72527060114531, // default value for longitude
         });
 
   // Get Longitude latitude from user location
@@ -553,6 +553,8 @@ class UserLocation extends StateNotifier<List<dynamic>> {
           await http.get(Uri.parse(MainUtil().getLocation), headers: headers);
 
       final json = jsonDecode(response.body);
+
+      print(json);
 
       state = json['data'];
 

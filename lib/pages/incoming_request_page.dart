@@ -48,20 +48,39 @@ class _IncomingRequestPageState extends ConsumerState<IncomingRequestPage> {
           ),
           body: Center(
             child: ref.watch(incomingRequestProvider).isEmpty
-                ? const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.warning_rounded,
-                          size: 100, color: Colors.grey),
-                      SizedBox(height: 10),
-                      Text(
-                        "Tidak ada permintaan masuk",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                ? RefreshIndicator(
+                    onRefresh: () async {
+                      Future.delayed(const Duration(seconds: 5));
+                      ref
+                          .read(incomingRequestProvider.notifier)
+                          .getIncomingRequest();
+
+                      ref.invalidate(incomingRequestProvider);
+
+                      setState(() {});
+                    },
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.9,
+                        width: MediaQuery.of(context).size.width,
+                        child: const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.warning_rounded,
+                                size: 100, color: Colors.grey),
+                            SizedBox(height: 10),
+                            Text(
+                              "Tidak ada permintaan masuk",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   )
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -70,129 +89,147 @@ class _IncomingRequestPageState extends ConsumerState<IncomingRequestPage> {
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height * 0.8,
                         margin: const EdgeInsets.only(top: 20),
-                        child: ListView.builder(
-                          itemCount: ref.watch(incomingRequestProvider).length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              margin: const EdgeInsets.all(10),
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 1,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      const CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage: NetworkImage(
-                                            'https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png'),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Text(
-                                            ref.watch(incomingRequestProvider)[
-                                                index]['requester']['name'],
-                                            style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            ref.watch(incomingRequestProvider)[
-                                                            index]['requester']
-                                                        ['role'] ==
-                                                    'pembudidaya'
-                                                ? 'Pembudidaya'
-                                                : 'Pengepul',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          Text(
-                                            ref.watch(incomingRequestProvider)[
-                                                index]['requester']['email'],
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      BadgeInfo(
-                                        content: ref.watch(
-                                                incomingRequestProvider)[index]
-                                            ['appointment_date'],
-                                        color: CustomColors.lightBlue
-                                            .withOpacity(0.2),
-                                        style: TextStyle(
-                                            fontSize: 14.0,
-                                            color: CustomColors.primary
-                                                .withOpacity(0.8),
-                                            fontWeight: FontWeight.w600),
-                                        icon: const Icon(
-                                            Icons.calendar_month_rounded,
-                                            size: 15,
-                                            color: CustomColors.primary),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      BadgeInfo(
-                                        content: Helpers().removeSeconds(
-                                            ref.watch(incomingRequestProvider)[
-                                                index]['appointment_time']),
-                                        color: CustomColors.lightBlue
-                                            .withOpacity(0.2),
-                                        style: TextStyle(
-                                            fontSize: 14.0,
-                                            color: CustomColors.primary
-                                                .withOpacity(0.8),
-                                            fontWeight: FontWeight.w600),
-                                        icon: const Icon(
-                                            Icons.access_time_filled,
-                                            size: 15,
-                                            color: CustomColors.primary),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      UpdateButton(
-                                          status: 1,
-                                          appointmentId: ref.watch(
-                                                  incomingRequestProvider)[
-                                              index]['appointment_id']),
-                                      const SizedBox(width: 10),
-                                      UpdateButton(
-                                          status: 0,
-                                          appointmentId: ref.watch(
-                                                  incomingRequestProvider)[
-                                              index]['appointment_id']),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            );
+                        child: RefreshIndicator(
+                          onRefresh: () async {
+                            Future.delayed(const Duration(seconds: 5));
+                            ref
+                                .read(incomingRequestProvider.notifier)
+                                .getIncomingRequest();
+
+                            ref.invalidate(incomingRequestProvider);
+
+                            setState(() {});
                           },
+                          child: ListView.builder(
+                            itemCount:
+                                ref.watch(incomingRequestProvider).length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                margin: const EdgeInsets.all(10),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 1,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  children: <Widget>[
+                                    Row(
+                                      children: <Widget>[
+                                        const CircleAvatar(
+                                          radius: 30,
+                                          backgroundImage: NetworkImage(
+                                              'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                              ref.watch(
+                                                      incomingRequestProvider)[
+                                                  index]['requester']['name'],
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              ref.watch(incomingRequestProvider)[
+                                                                  index]
+                                                              ['requester']
+                                                          ['role'] ==
+                                                      'pembudidaya'
+                                                  ? 'Pembudidaya'
+                                                  : 'Pengepul',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            Text(
+                                              ref.watch(
+                                                      incomingRequestProvider)[
+                                                  index]['requester']['email'],
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        BadgeInfo(
+                                          content: ref.watch(
+                                                  incomingRequestProvider)[
+                                              index]['appointment_date'],
+                                          color: CustomColors.lightBlue
+                                              .withOpacity(0.2),
+                                          style: TextStyle(
+                                              fontSize: 14.0,
+                                              color: CustomColors.primary
+                                                  .withOpacity(0.8),
+                                              fontWeight: FontWeight.w600),
+                                          icon: const Icon(
+                                              Icons.calendar_month_rounded,
+                                              size: 15,
+                                              color: CustomColors.primary),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        BadgeInfo(
+                                          content: Helpers().removeSeconds(
+                                              ref.watch(
+                                                      incomingRequestProvider)[
+                                                  index]['appointment_time']),
+                                          color: CustomColors.lightBlue
+                                              .withOpacity(0.2),
+                                          style: TextStyle(
+                                              fontSize: 14.0,
+                                              color: CustomColors.primary
+                                                  .withOpacity(0.8),
+                                              fontWeight: FontWeight.w600),
+                                          icon: const Icon(
+                                              Icons.access_time_filled,
+                                              size: 15,
+                                              color: CustomColors.primary),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        UpdateButton(
+                                            status: 1,
+                                            appointmentId: ref.watch(
+                                                    incomingRequestProvider)[
+                                                index]['appointment_id']),
+                                        const SizedBox(width: 10),
+                                        UpdateButton(
+                                            status: 0,
+                                            appointmentId: ref.watch(
+                                                    incomingRequestProvider)[
+                                                index]['appointment_id']),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ],

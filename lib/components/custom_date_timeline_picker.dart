@@ -87,8 +87,9 @@ class _CustomDateTimelineState extends ConsumerState<CustomDateTimeline> {
                 fontWeight: FontWeight.w600,
               ))),
       headerProps: const EasyHeaderProps(
-        dateFormatter: DateFormatter.fullDateDMonthAsStrY(),
-      ),
+          dateFormatter: DateFormatter.fullDateDMonthAsStrY(),
+          monthPickerType: MonthPickerType.dropDown,
+          showMonthPicker: true),
       locale: 'id_ID',
     );
   }

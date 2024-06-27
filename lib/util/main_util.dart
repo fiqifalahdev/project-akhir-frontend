@@ -1,9 +1,11 @@
 class MainUtil {
   // final String _baseUrl = 'http://10.0.2.2:8000/api/';
-  final String _baseUrl = 'http://192.168.144.181:8000/api/';
+  // final String _baseUrl = 'http://192.168.18.5:8000/api/';
+  final String _baseUrl = 'http://tambakku-app.fiqifalahdev.org/api/';
 
   // final String _publicDomain = 'http://10.0.2.2:8000/storage/';
-  final String _publicDomain = 'http://192.168.144.181:8000/storage/';
+  // final String _publicDomain = 'http://192.168.18.5:8000/storage/';
+  final String _publicDomain = 'http://tambakku-app.fiqifalahdev.org/storage/';
 
   // Get public domain
   String get publicDomain => _publicDomain;

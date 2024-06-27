@@ -41,11 +41,11 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
     String address =
         "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.postalCode}, ${placemark.country}";
 
-    ref.read(addressProvider.notifier).setAddress({
-      'address': address.toString(),
-      'latitude': location.latitude.toString(),
-      'longitude': location.longitude.toString()
-    });
+    // ref.read(addressProvider.notifier).setAddress({
+    //   'address': address.toString(),
+    //   'latitude': location.latitude.toString(),
+    //   'longitude': location.longitude.toString()
+    // });
   }
 
   Future<void> _getBaseInfo() async {
@@ -98,7 +98,7 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
         ),
       ),
       Positioned(
-        top: 550,
+        top: 650,
         left: 50,
         child: Row(
           // crossAxisAlignment: CrossAxisAlignment.end,
