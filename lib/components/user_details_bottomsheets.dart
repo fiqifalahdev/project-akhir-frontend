@@ -151,17 +151,12 @@ class _UserDetailBottomSheetState extends ConsumerState<UserDetailBottomSheet> {
                             const SizedBox(
                               height: 15,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                    "Alamat : ${details['address'] ?? "Alamat User"}",
-                                    style: TextStyle(
-                                        fontSize: 14.0,
-                                        color: CustomColors.blackOpacity,
-                                        fontWeight: FontWeight.w600)),
-                              ],
-                            ),
+                            Text(
+                                "Alamat : ${details['address'] ?? "Alamat User"}",
+                                style: TextStyle(
+                                    fontSize: 14.0,
+                                    color: CustomColors.blackOpacity,
+                                    fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),

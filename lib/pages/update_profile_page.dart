@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/models/base_info.dart';
 import 'package:frontend_tambakku/pages/layout.dart';
+import 'package:frontend_tambakku/pages/location_page.dart';
 import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'package:intl/intl.dart';
@@ -35,6 +36,10 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
 
   bool isLoading = false;
 
+  void getUserLocation() async {
+    addressController.text = await ref.watch(addressProvider);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -43,6 +48,8 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    getUserLocation();
+
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
@@ -290,6 +297,21 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                     borderSide: const BorderSide(width: 5),
                     borderRadius: BorderRadius.circular(8)),
                 hintText: widget.data.address ?? "Masukkan Alamat Anda")),
+        const SizedBox(height: 10),
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: CustomColors.primary,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8))),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const LocationPage()));
+            },
+            child: const Text("Pilih Lokasi",
+                style: TextStyle(color: Colors.white))),
         const SizedBox(
           height: 20,
         ),

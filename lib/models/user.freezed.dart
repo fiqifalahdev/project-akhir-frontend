@@ -27,6 +27,8 @@ mixin _$User {
   String get phone => throw _privateConstructorUsedError;
   String get birthdate => throw _privateConstructorUsedError;
   String get gender => throw _privateConstructorUsedError;
+  String get about => throw _privateConstructorUsedError;
+  String get address => throw _privateConstructorUsedError;
   String get role => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -47,6 +49,8 @@ abstract class $UserCopyWith<$Res> {
       String phone,
       String birthdate,
       String gender,
+      String about,
+      String address,
       String role});
 }
 
@@ -70,6 +74,8 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? phone = null,
     Object? birthdate = null,
     Object? gender = null,
+    Object? about = null,
+    Object? address = null,
     Object? role = null,
   }) {
     return _then(_value.copyWith(
@@ -101,6 +107,14 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
               as String,
+      about: null == about
+          ? _value.about
+          : about // ignore: cast_nullable_to_non_nullable
+              as String,
+      address: null == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
       role: null == role
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
@@ -124,6 +138,8 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       String phone,
       String birthdate,
       String gender,
+      String about,
+      String address,
       String role});
 }
 
@@ -144,6 +160,8 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? phone = null,
     Object? birthdate = null,
     Object? gender = null,
+    Object? about = null,
+    Object? address = null,
     Object? role = null,
   }) {
     return _then(_$UserImpl(
@@ -175,6 +193,14 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
               as String,
+      about: null == about
+          ? _value.about
+          : about // ignore: cast_nullable_to_non_nullable
+              as String,
+      address: null == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
       role: null == role
           ? _value.role
           : role // ignore: cast_nullable_to_non_nullable
@@ -194,6 +220,8 @@ class _$UserImpl implements _User {
       required this.phone,
       required this.birthdate,
       required this.gender,
+      required this.about,
+      required this.address,
       required this.role});
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
@@ -214,11 +242,15 @@ class _$UserImpl implements _User {
   @override
   final String gender;
   @override
+  final String about;
+  @override
+  final String address;
+  @override
   final String role;
 
   @override
   String toString() {
-    return 'User(name: $name, email: $email, password: $password, password_confirmation: $password_confirmation, phone: $phone, birthdate: $birthdate, gender: $gender, role: $role)';
+    return 'User(name: $name, email: $email, password: $password, password_confirmation: $password_confirmation, phone: $phone, birthdate: $birthdate, gender: $gender, about: $about, address: $address, role: $role)';
   }
 
   @override
@@ -236,13 +268,15 @@ class _$UserImpl implements _User {
             (identical(other.birthdate, birthdate) ||
                 other.birthdate == birthdate) &&
             (identical(other.gender, gender) || other.gender == gender) &&
+            (identical(other.about, about) || other.about == about) &&
+            (identical(other.address, address) || other.address == address) &&
             (identical(other.role, role) || other.role == role));
   }
 
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, name, email, password,
-      password_confirmation, phone, birthdate, gender, role);
+      password_confirmation, phone, birthdate, gender, about, address, role);
 
   @JsonKey(ignore: true)
   @override
@@ -267,6 +301,8 @@ abstract class _User implements User {
       required final String phone,
       required final String birthdate,
       required final String gender,
+      required final String about,
+      required final String address,
       required final String role}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
@@ -285,6 +321,10 @@ abstract class _User implements User {
   String get birthdate;
   @override
   String get gender;
+  @override
+  String get about;
+  @override
+  String get address;
   @override
   String get role;
   @override

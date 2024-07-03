@@ -47,6 +47,8 @@ class RegistrationState extends StateNotifier<User> {
             phone: '',
             birthdate: '',
             gender: '',
+            about: '',
+            address: '',
             role: ''));
 
   // Define a method to register a user
@@ -419,12 +421,6 @@ class AddressProvider extends StateNotifier<String> {
       'longitude': params['longitude'],
     };
 
-    ref.read(locationProvider.notifier).setLongLat(
-        double.parse(params['latitude']), double.parse(params['longitude']));
-
-    // final prefs = await SharedPreferences.getInstance();
-    // final token = prefs.get('token');
-
     final token = ref.watch(tokenProvider);
     print("Tokwen : $token");
 
@@ -432,11 +428,12 @@ class AddressProvider extends StateNotifier<String> {
 
     headers.addEntries(tokenMap.entries);
 
-    // print("=====================================");
-    // print("Headers: $headers");
-    // print("Body: $body");
-    // print("Token: $token");
-    // print("=====================================");
+    print("=============== Address =============");
+    print("=====================================");
+    print("Headers: $headers");
+    print("Body: $body");
+    print("Token: $token");
+    print("=====================================");
 
     // Make a post request to the server
     final response = await http.post(Uri.parse(MainUtil().postLocation),
