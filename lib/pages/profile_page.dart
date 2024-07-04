@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/pages/add_product_page.dart';
+import 'package:frontend_tambakku/pages/feed_details_page.dart';
 import 'package:frontend_tambakku/pages/login_page.dart';
 import 'package:frontend_tambakku/pages/update_profile_page.dart';
 import 'package:frontend_tambakku/util/main_util.dart';
@@ -62,10 +63,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               child: GridView.builder(
                 itemCount: feeds.length,
                 itemBuilder: (context, index) {
+                  print("feeds: ${feeds[index]}");
                   // Render Feed Image
                   return InkWell(
                     onTap: () {
                       print("Masuk Ke detail Produk");
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProductDetailsPage(
+                                    image: feeds[index].image,
+                                    caption: feeds[index].caption,
+                                    id: feeds[index].id!,
+                                    createdAt: feeds[index].created_at!,
+                                  )));
                     },
                     child: Image.network(
                       MainUtil().publicDomain + feeds[index].image,
