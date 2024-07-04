@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend_tambakku/pages/all_user_page.dart';
 import 'package:frontend_tambakku/pages/appointment_request_page.dart';
 import 'package:frontend_tambakku/pages/fish_price.dart';
 import 'package:frontend_tambakku/pages/incoming_request_page.dart';
@@ -44,7 +45,6 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-    
       title: 'Tambakku APP 1.0.0',
       theme: ThemeData(fontFamily: 'Montserrat'),
       debugShowCheckedModeBanner: false,
@@ -65,6 +65,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         '/fish-price': (context) => Layout(
               index: 2,
             ),
+        '/all-user': (context) => const AllUserPage(),
         '/notification': (context) => const NotificationPage(),
       },
     );

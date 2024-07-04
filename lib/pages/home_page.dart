@@ -1,8 +1,13 @@
+import 'package:bottom_sheet/bottom_sheet.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/components/badge_info.dart';
+import 'package:frontend_tambakku/components/user_details_bottomsheets.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/util/helpers.dart';
+import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -48,235 +53,400 @@ class _HomepageState extends State<Homepage> {
 
             setState(() {});
           },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
+          child: Container(
+            height: 500,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              shrinkWrap: true,
               children: [
-                // Headline Text
-                const Text(
-                  "Dapatkan akses informasi secara lengkap dan terhubung secara luas dengan pengepul dan pembudidaya Sidoarjo.",
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                      fontFamily: 'Montserrat',
-                      height: 1.5),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Column(
                   children: [
-                    homepageFeatures(
-                      imageAssets: 'lib/assets/ringbell.png',
-                      label: "Daftar Permintaan Masuk",
-                      value: "${ref.watch(appointmentSumProvider)}",
-                      color: CustomColors.pastelBlu,
-                      opacity: 0.3,
-                      onPressed: () =>
-                          Navigator.pushNamed(context, '/incoming-request'),
+                    // Headline Text
+                    const Text(
+                      "Dapatkan akses informasi secara lengkap dan terhubung secara luas dengan pengepul dan pembudidaya Sidoarjo.",
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          fontFamily: 'Montserrat',
+                          height: 1.5),
                     ),
-                    homepageFeatures(
-                        imageAssets: 'lib/assets/calendar-2.png',
-                        label: "Permintaan Saya",
-                        color: CustomColors.pastelGreen,
-                        opacity: 0.3,
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/my-appointment')),
-                  ],
-                ),
-                // Appointment Request Features
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    homepageFeatures(
-                        imageAssets: 'lib/assets/location-pin.png',
-                        label: "Temui Pembudidaya",
-                        color: CustomColors.pastelYellow,
-                        opacity: 0.3,
-                        onPressed: () => Navigator.pushNamed(context, '/maps')),
-                    homepageFeatures(
-                        imageAssets: 'lib/assets/price.png',
-                        label: "Lihat Harga Ikan",
-                        color: CustomColors.pastelPink,
-                        opacity: 0.3,
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/fish-price')),
-                  ],
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    color: CustomColors.pastelMediumLightBlu,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [CustomColors.boxShadow],
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                          bottom: -5,
-                          right: -5,
-                          child: Image.asset(
-                            'lib/assets/quickly.png',
-                            opacity: const AlwaysStoppedAnimation(0.3),
-                          )),
-                      Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Janji temu yang akan datang",
-                                style: TextStyle(
-                                    color: CustomColors.darkBlue,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              requester == null
-                                  ? const Text(
-                                      "Tidak ada janji temu yang akan datang")
-                                  : Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        homepageFeatures(
+                          imageAssets: 'lib/assets/ringbell.png',
+                          label: "Daftar Permintaan Masuk",
+                          value: "${ref.watch(appointmentSumProvider)}",
+                          color: CustomColors.pastelBlu,
+                          opacity: 0.3,
+                          onPressed: () =>
+                              Navigator.pushNamed(context, '/incoming-request'),
+                        ),
+                        homepageFeatures(
+                            imageAssets: 'lib/assets/calendar-2.png',
+                            label: "Permintaan Saya",
+                            color: CustomColors.pastelGreen,
+                            opacity: 0.3,
+                            onPressed: () => Navigator.pushNamed(
+                                context, '/my-appointment')),
+                      ],
+                    ),
+                    // Appointment Request Features
+                    // const SizedBox(
+                    //   height: 15,
+                    // ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     homepageFeatures(
+                    //         imageAssets: 'lib/assets/location-pin.png',
+                    //         label: "Temui Pembudidaya",
+                    //         color: CustomColors.pastelYellow,
+                    //         opacity: 0.3,
+                    //         onPressed: () => Navigator.pushNamed(context, '/maps')),
+                    //     homepageFeatures(
+                    //         imageAssets: 'lib/assets/user-regis.png',
+                    //         label: "Lihat Semua Pengguna",
+                    //         color: CustomColors.pastelPink,
+                    //         opacity: 0.3,
+                    //         onPressed: () =>
+                    //             Navigator.pushNamed(context, '/all-user')),
+                    //   ],
+                    // ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color: CustomColors.pastelMediumLightBlu,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [CustomColors.boxShadow],
+                      ),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                              bottom: -5,
+                              right: -5,
+                              child: Image.asset(
+                                'lib/assets/quickly.png',
+                                opacity: const AlwaysStoppedAnimation(0.3),
+                              )),
+                          Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "Janji temu yang akan datang",
+                                    style: TextStyle(
+                                        color: CustomColors.darkBlue,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  requester == null
+                                      ? const Text(
+                                          "Tidak ada janji temu yang akan datang")
+                                      : Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              "${requester['name']}",
-                                              style: const TextStyle(
-                                                  color: CustomColors.darkBlue,
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w600),
-                                            ),
-                                            const Text(
-                                              " - ",
-                                              style: TextStyle(
-                                                  color: CustomColors.darkBlue,
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w600),
-                                            ),
-                                            Text(
-                                              requester['role'] == 'pembudidaya'
-                                                  ? 'Pembudidaya'
-                                                  : 'Pengepul',
-                                              style: const TextStyle(
-                                                  color: CustomColors.darkBlue,
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w600),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Row(
-                                          children: [
-                                            BadgeInfo(
-                                              content:
-                                                  "${latest['appointment_date']}",
-                                              color: CustomColors.primary,
-                                              style: const TextStyle(
-                                                  fontSize: 14.0,
-                                                  color: CustomColors.putih,
-                                                  fontWeight: FontWeight.w700),
-                                              icon: const Icon(
-                                                  Icons.calendar_month_rounded,
-                                                  size: 15,
-                                                  color: CustomColors.putih),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            BadgeInfo(
-                                              content: Helpers().removeSeconds(
-                                                  "${latest['appointment_time']}"),
-                                              color: CustomColors.primary,
-                                              style: TextStyle(
-                                                  fontSize: 14.0,
-                                                  color: CustomColors.putih
-                                                      .withOpacity(0.8),
-                                                  fontWeight: FontWeight.w700),
-                                              icon: const Icon(
-                                                  Icons.access_time_filled,
-                                                  size: 15,
-                                                  color: CustomColors.putih),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            TextButton.icon(
-                                                onPressed: () {
-                                                  // redirect to whatsapp chat
-                                                  print(
-                                                      "Requester Phone ${requester['phone']}");
-
-                                                  Helpers().launchWhatsapp(
-                                                      "08815018220",
-                                                      "Halo, saya dari ${requester['name']}. Saya ingin mengonfirmasi janji temu kita pada tanggal ${latest['appointment_date']} pukul ${Helpers().removeSeconds(latest['appointment_time'])}");
-                                                },
-                                                style: ButtonStyle(
-                                                  foregroundColor:
-                                                      MaterialStateProperty.all<
-                                                              Color>(
-                                                          CustomColors.putih),
-                                                  shape:
-                                                      MaterialStateProperty.all<
-                                                          RoundedRectangleBorder>(
-                                                    RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                    ),
-                                                  ),
-                                                  backgroundColor:
-                                                      MaterialStateProperty.all<
-                                                              Color>(
-                                                          const Color(
-                                                              0xff25d366)),
-                                                  minimumSize:
-                                                      MaterialStateProperty.all<
-                                                              Size>(
-                                                          const Size(80, 30)),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "${requester['name']}",
+                                                  style: const TextStyle(
+                                                      color:
+                                                          CustomColors.darkBlue,
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w600),
                                                 ),
-                                                icon: const Icon(
-                                                  Icons.sms_rounded,
-                                                  size: 15,
-                                                  color: CustomColors.putih,
-                                                ),
-                                                label: const Text(
-                                                  "Hubungi",
+                                                const Text(
+                                                  " - ",
                                                   style: TextStyle(
+                                                      color:
+                                                          CustomColors.darkBlue,
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                                Text(
+                                                  requester['role'] ==
+                                                          'pembudidaya'
+                                                      ? 'Pembudidaya'
+                                                      : 'Pengepul',
+                                                  style: const TextStyle(
+                                                      color:
+                                                          CustomColors.darkBlue,
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              children: [
+                                                BadgeInfo(
+                                                  content:
+                                                      "${latest['appointment_date']}",
+                                                  color: CustomColors.primary,
+                                                  style: const TextStyle(
                                                       fontSize: 14.0,
-                                                      // color: Color(0xff25d366),
                                                       color: CustomColors.putih,
                                                       fontWeight:
-                                                          FontWeight.bold),
-                                                )),
+                                                          FontWeight.w700),
+                                                  icon: const Icon(
+                                                      Icons
+                                                          .calendar_month_rounded,
+                                                      size: 15,
+                                                      color:
+                                                          CustomColors.putih),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                BadgeInfo(
+                                                  content: Helpers().removeSeconds(
+                                                      "${latest['appointment_time']}"),
+                                                  color: CustomColors.primary,
+                                                  style: TextStyle(
+                                                      fontSize: 14.0,
+                                                      color: CustomColors.putih
+                                                          .withOpacity(0.8),
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                  icon: const Icon(
+                                                      Icons.access_time_filled,
+                                                      size: 15,
+                                                      color:
+                                                          CustomColors.putih),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                TextButton.icon(
+                                                    onPressed: () {
+                                                      // redirect to whatsapp chat
+                                                      print(
+                                                          "Requester Phone ${requester['phone']}");
+
+                                                      Helpers().launchWhatsapp(
+                                                          "08815018220",
+                                                          "Halo, saya dari ${requester['name']}. Saya ingin mengonfirmasi janji temu kita pada tanggal ${latest['appointment_date']} pukul ${Helpers().removeSeconds(latest['appointment_time'])}");
+                                                    },
+                                                    style: ButtonStyle(
+                                                      foregroundColor:
+                                                          MaterialStateProperty
+                                                              .all<
+                                                                      Color>(
+                                                                  CustomColors
+                                                                      .putih),
+                                                      shape: MaterialStateProperty
+                                                          .all<
+                                                              RoundedRectangleBorder>(
+                                                        RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                        ),
+                                                      ),
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .all<
+                                                                      Color>(
+                                                                  const Color(
+                                                                      0xff25d366)),
+                                                      minimumSize:
+                                                          MaterialStateProperty
+                                                              .all<
+                                                                      Size>(
+                                                                  const Size(
+                                                                      80, 30)),
+                                                    ),
+                                                    icon: const Icon(
+                                                      Icons.sms_rounded,
+                                                      size: 15,
+                                                      color: CustomColors.putih,
+                                                    ),
+                                                    label: const Text(
+                                                      "Hubungi",
+                                                      style: TextStyle(
+                                                          fontSize: 14.0,
+                                                          // color: Color(0xff25d366),
+                                                          color: CustomColors
+                                                              .putih,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    )),
+                                              ],
+                                            ),
                                           ],
+                                        )
+                                ],
+                              ))
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 15,
+                    ),
+
+                    Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Icon(
+                            Icons.arrow_back_ios_rounded,
+                            color: CustomColors.darkBlue,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/all-user');
+                            },
+                            child: const Text(
+                              "Lihat Semua Pengguna",
+                              style: TextStyle(
+                                  color: CustomColors.darkBlue,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 5,
+                    ),
+                  ],
+                ),
+                const Text("Rekomendasi Pengguna",
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                const SizedBox(
+                  height: 15,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.35,
+                  child: Column(
+                    children: [
+                      for (var user in ref.watch(homepageUserProvider)) ...[
+                        // ListTile
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          margin: const EdgeInsets.symmetric(vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 1,
+                                blurRadius: 7,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: NetworkImage(
+                                          "${MainUtil().publicDomain}${user['profile_image'] ?? 'https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png'}"),
+                                    ),
+                                    const SizedBox(width: 15),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          user['name'],
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: CustomColors.darkBlue,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          user['email'],
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          user['role'] == "pembudidaya"
+                                              ? "Pembudidaya"
+                                              : "Pengepul",
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
                                         ),
                                       ],
-                                    )
-                            ],
-                          ))
+                                    ),
+                                  ],
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      ref.read(userIdProvider.notifier).update(
+                                          (state) => state = user['id']);
+
+                                      showFlexibleBottomSheet(
+                                        context: context,
+                                        builder: (context, scrollController,
+                                                bottomSheetOffset) =>
+                                            UserDetailBottomSheet(
+                                          scrollController: scrollController,
+                                          bottomSheetOffset: bottomSheetOffset,
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(
+                                        Icons.arrow_forward_ios_rounded))
+                              ],
+                            ),
+                          ),
+                        ),
+                      ]
                     ],
                   ),
-                ),
+                )
               ],
             ),
           ),
         );
       }),
+    );
+  }
+
+  Widget _buildUserInfo({required String label, required TextStyle style}) {
+    return Text(
+      label,
+      style: style,
     );
   }
 

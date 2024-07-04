@@ -355,6 +355,16 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                       ? widget.data.profileImage
                       : profileImage
                 }, token).then((value) {
+                  final location = ref.watch(locationProvider);
+
+                  print("Location from Update Profile : $location");
+
+                  ref.read(addressProvider.notifier).setAddress({
+                    'address': ref.watch(addressProvider),
+                    'latitude': location['latitude'].toString(),
+                    'longitude': location['longitude'].toString()
+                  });
+
                   setState(() {
                     isLoading = false;
                   });

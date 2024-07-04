@@ -249,6 +249,8 @@ final getBaseInfoProvider = StateNotifierProvider<BaseInfoState, BaseInfo>(
 
 final latestAppointment = StateProvider<Map<String, dynamic>>((ref) => {});
 
+final homepageUserProvider = StateProvider<List<dynamic>>((ref) => []);
+
 final appointmentSumProvider = StateProvider<int>((ref) => 0);
 
 class BaseInfoState extends StateNotifier<BaseInfo> {
@@ -291,6 +293,9 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
 
       ref.read(latestAppointment.notifier).state =
           jsonDecode(response.body)['data']['latestAppointment'] ?? {};
+
+      ref.read(homepageUserProvider.notifier).state =
+          jsonDecode(response.body)['data']['users'];
 
       state = state.copyWith(
         name: json['name'],
@@ -367,6 +372,47 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
       }
     } catch (e) {
       throw e.toString();
+    }
+  }
+}
+
+final allUserProvider =
+    StateNotifierProvider<UserProvider, List<dynamic>>((ref) {
+  return UserProvider(ref);
+});
+
+class UserProvider extends StateNotifier<List<dynamic>> {
+  final Ref ref;
+
+  UserProvider(this.ref) : super([]);
+
+  Future<void> getAllUser() async {
+    try {
+      final token = ref.watch(tokenProvider);
+
+      final tokenEntries = <String, String>{'Authorization': 'Bearer $token'};
+      headers.addEntries(tokenEntries.entries);
+
+      final response =
+          await http.get(Uri.parse(MainUtil().allUserData), headers: headers);
+
+      print("Response : ${response.body}");
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception("Gagal untuk mendapatkan data user: ${response.body}");
+      }
+
+      if (response.statusCode == 401) {
+        throw Exception("Internal Server Error : User unauthenticated");
+      }
+
+      final json = jsonDecode(response.body)['data'];
+
+      state = json;
+
+      print("State : $state");
+    } catch (e) {
+      throw Exception('Failed to get user location: $e');
     }
   }
 }
@@ -476,9 +522,49 @@ class LocationProvider extends StateNotifier<Map<String, double>> {
 
   LocationProvider(this.ref)
       : super({
-          'latitude': -7.4627977511063825, // default value for latitude
-          'longitude': 112.72527060114531, // default value for longitude
+          'latitude': 0, // default value for latitude
+          'longitude': 0, // default value for longitude
         });
+
+  // Get the current location of the user
+  void getLongLat() async {
+    try {
+      final token = ref.watch(tokenProvider);
+
+      final tokenEntries = <String, String>{'Authorization': 'Bearer $token'};
+
+      headers.addEntries(tokenEntries.entries);
+
+      print("headers : $headers");
+
+      final response = await http.get(Uri.parse(MainUtil().getCurrentLocation),
+          headers: headers);
+
+      print("Response : ${response.body}");
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(
+            "Gagal untuk mendapatkan lokasi user: ${response.body}");
+      }
+
+      if (response.statusCode == 401) {
+        throw Exception("Internal Server Error : User unauthenticated");
+      }
+
+      final json = jsonDecode(response.body)['data'];
+
+      print("Get current location : $json");
+
+      state = {
+        'latitude': double.parse(json['latitude']),
+        'longitude': double.parse(json['longitude']),
+      };
+
+      print("State : $state");
+    } catch (e) {
+      throw Exception('Failed to get user location: $e');
+    }
+  }
 
   // Get Longitude latitude from user location
   void setLongLat(double latitude, double longitude) async {

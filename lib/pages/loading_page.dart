@@ -29,7 +29,11 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   LocationServices locationServices = LocationServices();
 
   Future<void> _getUserLocation() async {
+    ref.read(locationProvider.notifier).getLongLat();
+
     final location = ref.watch(locationProvider);
+
+    print("Location from loading screen : $location");
 
     ref.read(addressProvider.notifier).setAddress({
       'address': ref.watch(addressProvider),
