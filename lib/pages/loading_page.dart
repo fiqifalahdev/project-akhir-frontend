@@ -29,23 +29,17 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   LocationServices locationServices = LocationServices();
 
   Future<void> _getUserLocation() async {
-    // get long lat
-    Position location = await locationServices.getLocation();
+    ref.read(locationProvider.notifier).getLongLat();
 
-    // get address from long lat
-    List<Placemark> listOfAddress =
-        await placemarkFromCoordinates(location.latitude, location.longitude);
+    final location = ref.watch(locationProvider);
 
-    Placemark placemark = listOfAddress[0];
+    print("Location from loading screen : $location");
 
-    String address =
-        "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.postalCode}, ${placemark.country}";
-
-    // ref.read(addressProvider.notifier).setAddress({
-    //   'address': address.toString(),
-    //   'latitude': location.latitude.toString(),
-    //   'longitude': location.longitude.toString()
-    // });
+    ref.read(addressProvider.notifier).setAddress({
+      'address': ref.watch(addressProvider),
+      'latitude': location['latitude'].toString(),
+      'longitude': location['longitude'].toString()
+    });
   }
 
   Future<void> _getBaseInfo() async {

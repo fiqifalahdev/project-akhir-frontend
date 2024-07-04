@@ -47,6 +47,8 @@ class RegistrationState extends StateNotifier<User> {
             phone: '',
             birthdate: '',
             gender: '',
+            about: '',
+            address: '',
             role: ''));
 
   // Define a method to register a user
@@ -247,6 +249,8 @@ final getBaseInfoProvider = StateNotifierProvider<BaseInfoState, BaseInfo>(
 
 final latestAppointment = StateProvider<Map<String, dynamic>>((ref) => {});
 
+final homepageUserProvider = StateProvider<List<dynamic>>((ref) => []);
+
 final appointmentSumProvider = StateProvider<int>((ref) => 0);
 
 class BaseInfoState extends StateNotifier<BaseInfo> {
@@ -289,6 +293,9 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
 
       ref.read(latestAppointment.notifier).state =
           jsonDecode(response.body)['data']['latestAppointment'] ?? {};
+
+      ref.read(homepageUserProvider.notifier).state =
+          jsonDecode(response.body)['data']['users'];
 
       state = state.copyWith(
         name: json['name'],
@@ -369,6 +376,47 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
   }
 }
 
+final allUserProvider =
+    StateNotifierProvider<UserProvider, List<dynamic>>((ref) {
+  return UserProvider(ref);
+});
+
+class UserProvider extends StateNotifier<List<dynamic>> {
+  final Ref ref;
+
+  UserProvider(this.ref) : super([]);
+
+  Future<void> getAllUser() async {
+    try {
+      final token = ref.watch(tokenProvider);
+
+      final tokenEntries = <String, String>{'Authorization': 'Bearer $token'};
+      headers.addEntries(tokenEntries.entries);
+
+      final response =
+          await http.get(Uri.parse(MainUtil().allUserData), headers: headers);
+
+      print("Response : ${response.body}");
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception("Gagal untuk mendapatkan data user: ${response.body}");
+      }
+
+      if (response.statusCode == 401) {
+        throw Exception("Internal Server Error : User unauthenticated");
+      }
+
+      final json = jsonDecode(response.body)['data'];
+
+      state = json;
+
+      print("State : $state");
+    } catch (e) {
+      throw Exception('Failed to get user location: $e');
+    }
+  }
+}
+
 // =================================================================================
 // =============================== File/Image Provider =============================
 // =================================================================================
@@ -419,12 +467,6 @@ class AddressProvider extends StateNotifier<String> {
       'longitude': params['longitude'],
     };
 
-    ref.read(locationProvider.notifier).setLongLat(
-        double.parse(params['latitude']), double.parse(params['longitude']));
-
-    // final prefs = await SharedPreferences.getInstance();
-    // final token = prefs.get('token');
-
     final token = ref.watch(tokenProvider);
     print("Tokwen : $token");
 
@@ -432,11 +474,12 @@ class AddressProvider extends StateNotifier<String> {
 
     headers.addEntries(tokenMap.entries);
 
-    // print("=====================================");
-    // print("Headers: $headers");
-    // print("Body: $body");
-    // print("Token: $token");
-    // print("=====================================");
+    print("=============== Address =============");
+    print("=====================================");
+    print("Headers: $headers");
+    print("Body: $body");
+    print("Token: $token");
+    print("=====================================");
 
     // Make a post request to the server
     final response = await http.post(Uri.parse(MainUtil().postLocation),
@@ -479,9 +522,49 @@ class LocationProvider extends StateNotifier<Map<String, double>> {
 
   LocationProvider(this.ref)
       : super({
-          'latitude': -7.4627977511063825, // default value for latitude
-          'longitude': 112.72527060114531, // default value for longitude
+          'latitude': 0, // default value for latitude
+          'longitude': 0, // default value for longitude
         });
+
+  // Get the current location of the user
+  void getLongLat() async {
+    try {
+      final token = ref.watch(tokenProvider);
+
+      final tokenEntries = <String, String>{'Authorization': 'Bearer $token'};
+
+      headers.addEntries(tokenEntries.entries);
+
+      print("headers : $headers");
+
+      final response = await http.get(Uri.parse(MainUtil().getCurrentLocation),
+          headers: headers);
+
+      print("Response : ${response.body}");
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception(
+            "Gagal untuk mendapatkan lokasi user: ${response.body}");
+      }
+
+      if (response.statusCode == 401) {
+        throw Exception("Internal Server Error : User unauthenticated");
+      }
+
+      final json = jsonDecode(response.body)['data'];
+
+      print("Get current location : $json");
+
+      state = {
+        'latitude': double.parse(json['latitude']),
+        'longitude': double.parse(json['longitude']),
+      };
+
+      print("State : $state");
+    } catch (e) {
+      throw Exception('Failed to get user location: $e');
+    }
+  }
 
   // Get Longitude latitude from user location
   void setLongLat(double latitude, double longitude) async {

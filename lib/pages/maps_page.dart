@@ -323,7 +323,6 @@ class _MapsPageState extends ConsumerState<MapsPage>
     return Container(
       padding: const EdgeInsets.only(top: 18, left: 18, right: 18, bottom: 10),
       margin: const EdgeInsets.only(right: 10),
-      height: 200,
       decoration: BoxDecoration(
         color: CustomColors.putih,
         borderRadius: BorderRadius.circular(10),
@@ -367,15 +366,13 @@ class _MapsPageState extends ConsumerState<MapsPage>
           const SizedBox(
             height: 15,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text("Alamat : ${details['address'] ?? "Alamat User"}",
-                  style: TextStyle(
-                      fontSize: 14.0,
-                      color: CustomColors.blackOpacity,
-                      fontWeight: FontWeight.w600)),
-            ],
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.95,
+            child: Text("Alamat : ${details['address'] ?? "Alamat User"}",
+                style: TextStyle(
+                    fontSize: 14.0,
+                    color: CustomColors.blackOpacity,
+                    fontWeight: FontWeight.w600)),
           ),
         ],
       ),
