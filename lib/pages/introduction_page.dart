@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_tambakku/pages/login_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ================== Introduction Page ===================
 // Nanti ditambahkan Stepper dan 2 halaman lagi untuk intro

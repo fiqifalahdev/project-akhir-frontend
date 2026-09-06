@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/models/base_info.dart';
 import 'package:frontend_tambakku/pages/layout.dart';
+import 'package:frontend_tambakku/pages/location_page.dart';
 import 'package:frontend_tambakku/util/main_util.dart';
 import 'package:frontend_tambakku/util/styles.dart';
 import 'package:intl/intl.dart';
@@ -35,6 +36,10 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
 
   bool isLoading = false;
 
+  void getUserLocation() async {
+    addressController.text = await ref.watch(addressProvider);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -43,18 +48,24 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    getUserLocation();
+
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
-        elevation: 1,
-        leadingWidth: 50,
-        backgroundColor: Colors.white,
-        shadowColor: Colors.grey[50],
+        backgroundColor: CustomColors.darkBlue,
+        title: const Text(
+          "Ubah Profil",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: CustomColors.putih,
+          ),
+        ),
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back_ios_new),
-          iconSize: 30,
-          color: CustomColors.darkBlue,
+          color: CustomColors.putih,
         ),
       ),
       body: SingleChildScrollView(
@@ -86,8 +97,8 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                                     fit: BoxFit.cover,
                                   )
                                 : profileImage.path.isEmpty
-                                    ? Image.asset(
-                                        "lib/assets/profile-avatar.jpg",
+                                    ? Image.network(
+                                        "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
                                         fit: BoxFit.cover,
                                       )
                                     : Image.file(
@@ -286,6 +297,21 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                     borderSide: const BorderSide(width: 5),
                     borderRadius: BorderRadius.circular(8)),
                 hintText: widget.data.address ?? "Masukkan Alamat Anda")),
+        const SizedBox(height: 10),
+        ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: CustomColors.primary,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8))),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const LocationPage()));
+            },
+            child: const Text("Pilih Lokasi",
+                style: TextStyle(color: Colors.white))),
         const SizedBox(
           height: 20,
         ),
@@ -329,6 +355,16 @@ class _UpdateProfilePageState extends ConsumerState<UpdateProfilePage> {
                       ? widget.data.profileImage
                       : profileImage
                 }, token).then((value) {
+                  final location = ref.watch(locationProvider);
+
+                  print("Location from Update Profile : $location");
+
+                  ref.read(addressProvider.notifier).setAddress({
+                    'address': ref.watch(addressProvider),
+                    'latitude': location['latitude'].toString(),
+                    'longitude': location['longitude'].toString()
+                  });
+
                   setState(() {
                     isLoading = false;
                   });

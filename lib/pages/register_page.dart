@@ -1,23 +1,26 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend_tambakku/logic/states_new.dart';
 import 'package:frontend_tambakku/models/user.dart';
 import 'package:frontend_tambakku/pages/layout.dart';
 import 'package:frontend_tambakku/pages/loading_page.dart';
+import 'package:frontend_tambakku/pages/location_page.dart';
 import 'package:frontend_tambakku/util/styles.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:quickalert/quickalert.dart';
 
-class RegisterPage extends StatefulWidget {
+class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final GlobalKey<FormState> _credentialFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _personalDataFormKey = GlobalKey<FormState>();
 
@@ -29,6 +32,8 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController birthdate = TextEditingController();
   late String gender;
   late String role;
+  TextEditingController about = TextEditingController();
+  TextEditingController address = TextEditingController();
 
   bool passwordIsVisible = false;
   bool passwordConfirmationIsVisible = false;
@@ -36,6 +41,10 @@ class _RegisterPageState extends State<RegisterPage> {
   bool isLoading = false;
 
   late int step;
+
+  void getUserLocation() async {
+    address.text = await ref.watch(addressProvider);
+  }
 
   @override
   void initState() {
@@ -46,6 +55,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    getUserLocation();
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -180,7 +190,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 color: CustomColors.primary,
                 height: 55,
                 child: TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_personalDataFormKey.currentState!.validate()) {
                       // Set isLoading to true
                       setState(() {
@@ -195,6 +205,8 @@ class _RegisterPageState extends State<RegisterPage> {
                           phone: phoneNumber.text,
                           birthdate: birthdate.text,
                           gender: gender,
+                          about: about.text,
+                          address: address.text,
                           role: role);
 
                       ref
@@ -394,35 +406,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 100),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // =========================
-  // Additional Personal Data
-  // =========================
-  Widget personalDataForm() {
-    return Positioned(
-      top: -60,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-            key: _personalDataFormKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Daftar",
-                    style:
-                        TextStyle(fontSize: 37, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 15),
                 const Text("Nomor Telepon",
                     style:
@@ -446,106 +429,195 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 15),
-                const Text("Gender",
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-                const SizedBox(height: 10),
-                // Dropdown
-                SizedBox(
-                    child: DropdownButtonFormField(
-                  hint: const Text("Pilih Jenis Kelamin"),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: "Laki-laki",
-                      child: Text("Laki-laki"),
-                    ),
-                    DropdownMenuItem(
-                      value: "Perempuan",
-                      child: Text("Perempuan"),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    gender = value.toString();
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return "Jenis Kelamin tidak boleh kosong";
-                    }
-                  },
-                )),
-                const SizedBox(height: 15),
-                const Text("Peran",
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-                const SizedBox(height: 10),
-                // Dropdown
-                SizedBox(
-                    child: DropdownButtonFormField(
-                  hint: const Text("Pilih Peran Anda"),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                  ),
-                  items: const [
-                    DropdownMenuItem(
-                      value: "pembudidaya",
-                      child: Text("Pembudidaya"),
-                    ),
-                    DropdownMenuItem(
-                      value: "pengepul",
-                      child: Text("Pengepul"),
-                    ),
-                  ],
-                  onChanged: (value) {
-                    role = value.toString();
-                    print("Role : $role");
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return "Peran anda tidak boleh kosong";
-                    }
-                  },
-                )),
-                const SizedBox(height: 15),
-                const Text("Tanggal Lahir",
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: birthdate,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8))),
-                    hintText: "DD/MM/YYYY",
-                    hintStyle: const TextStyle(fontSize: 16),
-                    suffixIcon: IconButton(
-                        onPressed: () async {
-                          final value = await showDatePicker(context);
 
-                          if (value != null) {
-                            birthdate.text =
-                                DateFormat("dd-MM-yyyy").format(value[0]!);
-                          }
-                        },
-                        icon: const Icon(Icons.calendar_today)),
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "Tanggal Lahir tidak boleh kosong";
-                    }
-                    return null;
-                  },
-                ),
-                // Date Picker
+                const SizedBox(height: 100),
               ],
-            )),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // =========================
+  // Additional Personal Data
+  // =========================
+  Widget personalDataForm() {
+    return Positioned(
+      top: 80,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Container(
+        height: MediaQuery.of(context).size.height + 500,
+        // color: Colors.red,
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Daftar",
+                style: TextStyle(fontSize: 37, fontWeight: FontWeight.bold)),
+            // const SizedBox(height: 15),
+            Form(
+                key: _personalDataFormKey,
+                child: Container(
+                  padding: const EdgeInsets.only(bottom: 15),
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: ListView(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("Alamat",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w500)),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                              controller: address,
+                              maxLines: 4,
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderSide: const BorderSide(width: 5),
+                                      borderRadius: BorderRadius.circular(8)),
+                                  hintText: "Masukkan Alamat Anda")),
+                          const SizedBox(height: 10),
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: CustomColors.primary,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8))),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LocationPage()));
+                              },
+                              child: const Text("Pilih Lokasi",
+                                  style: TextStyle(color: Colors.white))),
+                          const SizedBox(height: 15),
+                          const Text("Tentang Deskripsi Bisnis Anda",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w500)),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                              controller: about,
+                              maxLines: 4,
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderSide: const BorderSide(width: 5),
+                                      borderRadius: BorderRadius.circular(8)),
+                                  hintText: "Tuliskan Deskripsi Bisnis Anda")),
+                          const SizedBox(height: 15),
+                          const Text("Gender",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w500)),
+                          const SizedBox(height: 10),
+                          // Dropdown
+                          SizedBox(
+                              child: DropdownButtonFormField(
+                            hint: const Text("Pilih Jenis Kelamin"),
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8)),
+                              ),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: "Laki-Laki",
+                                child: Text("Laki-Laki"),
+                              ),
+                              DropdownMenuItem(
+                                value: "Perempuan",
+                                child: Text("Perempuan"),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              gender = value.toString();
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return "Jenis Kelamin tidak boleh kosong";
+                              }
+                            },
+                          )),
+                          const SizedBox(height: 15),
+                          const Text("Peran",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w500)),
+                          const SizedBox(height: 10),
+                          // Dropdown
+                          SizedBox(
+                              child: DropdownButtonFormField(
+                            hint: const Text("Pilih Peran Anda"),
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8)),
+                              ),
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: "pembudidaya",
+                                child: Text("Pembudidaya"),
+                              ),
+                              DropdownMenuItem(
+                                value: "pengepul",
+                                child: Text("Pengepul"),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              role = value.toString();
+                              print("Role : $role");
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return "Peran anda tidak boleh kosong";
+                              }
+                            },
+                          )),
+                          const SizedBox(height: 15),
+                          const Text("Tanggal Lahir",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w500)),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: birthdate,
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8))),
+                              hintText: "DD/MM/YYYY",
+                              hintStyle: const TextStyle(fontSize: 16),
+                              suffixIcon: IconButton(
+                                  onPressed: () async {
+                                    final value = await showDatePicker(context);
+
+                                    if (value != null) {
+                                      birthdate.text = DateFormat("dd-MM-yyyy")
+                                          .format(value[0]!);
+                                    }
+                                  },
+                                  icon: const Icon(Icons.calendar_today)),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Tanggal Lahir tidak boleh kosong";
+                              }
+                              return null;
+                            },
+                          ),
+                          // Date Picker
+                        ],
+                      ),
+                    ],
+                  ),
+                )),
+          ],
+        ),
       ),
     );
   }

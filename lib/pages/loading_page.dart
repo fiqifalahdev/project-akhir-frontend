@@ -29,50 +29,52 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   LocationServices locationServices = LocationServices();
 
   Future<void> _getUserLocation() async {
-    // get long lat
-    Position location = await locationServices.getLocation();
+    ref.read(locationProvider.notifier).getLongLat();
 
-    // get address from long lat
-    List<Placemark> listOfAddress =
-        await placemarkFromCoordinates(location.latitude, location.longitude);
+    final location = ref.watch(locationProvider);
 
-    Placemark placemark = listOfAddress[0];
-
-    String address =
-        "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.postalCode}, ${placemark.country}";
+    print("Location from loading screen : $location");
 
     ref.read(addressProvider.notifier).setAddress({
-      'address': address.toString(),
-      'latitude': location.latitude.toString(),
-      'longitude': location.longitude.toString()
+      'address': ref.watch(addressProvider),
+      'latitude': location['latitude'].toString(),
+      'longitude': location['longitude'].toString()
     });
   }
 
   Future<void> _getBaseInfo() async {
     final token = ref.watch(tokenProvider);
-
     // Cek apakah token sudah ada belum jika ada arahkan ke Homepage jika belum ke login
     token.isEmpty
         ? Future.delayed(
-            const Duration(seconds: 5),
+            const Duration(seconds: 7),
             () {
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => const LoginPage()));
             },
           )
         : Future.delayed(
-            const Duration(seconds: 5),
+            const Duration(seconds: 7),
             () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => Layout(index: 0,)));
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Layout(
+                            index: 0,
+                          )));
             },
           );
+  }
+
+  Future<void> _getIncomingRequest() async {
+    ref.read(incomingRequestProvider.notifier).getIncomingRequest();
   }
 
   @override
   Widget build(BuildContext context) {
     _getBaseInfo();
     _getUserLocation();
+    _getIncomingRequest();
 
     return Scaffold(
         body: Stack(children: [
@@ -90,7 +92,7 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
         ),
       ),
       Positioned(
-        top: 550,
+        top: 650,
         left: 50,
         child: Row(
           // crossAxisAlignment: CrossAxisAlignment.end,
