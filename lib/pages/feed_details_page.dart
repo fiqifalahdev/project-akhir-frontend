@@ -66,7 +66,7 @@ class _ProductDetailsPageState extends ConsumerState<ProductDetailsPage> {
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.2,
+                      width: MediaQuery.of(context).size.width * 0.3,
                       child: BadgeInfo(
                         content: DateFormat("dd-MM-yyyy")
                             .format(DateTime.parse(widget.createdAt)),

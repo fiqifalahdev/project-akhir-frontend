@@ -279,6 +279,8 @@ class BaseInfoState extends StateNotifier<BaseInfo> {
         throw Exception("Internal Server Error : User unauthenticated");
       }
 
+      print("Response : ${response.body}");
+
       final json = jsonDecode(response.body)['data']['detail'];
       final feeds = jsonDecode(response.body)['data']['feeds'];
       ref.read(appointmentSumProvider.notifier).state =
@@ -522,8 +524,8 @@ class LocationProvider extends StateNotifier<Map<String, double>> {
 
   LocationProvider(this.ref)
       : super({
-          'latitude': 0, // default value for latitude
-          'longitude': 0, // default value for longitude
+          'latitude': -7.44857106952669, // default value for latitude
+          'longitude': 112.71818697402844, // default value for longitude
         });
 
   // Get the current location of the user
